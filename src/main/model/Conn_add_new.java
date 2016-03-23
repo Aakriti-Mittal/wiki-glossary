@@ -4,10 +4,8 @@ package main.model;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -36,39 +34,48 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 
 public class Conn_add_new extends HttpServlet 
 {
-    private static Client getClient() throws UnknownHostException {
-		Settings settings = Settings.settingsBuilder()
-		        .put("cluster.name", "oci").build();
+	  
+    private String INDEX_NAME="wiki";
+    private String DOC_TYPE="wiki";
+    private String cluster_name="oci";
+    private String host_name="localhost";//"u4vmotcdschap04.us.dell.com";
+    
+    /*
+     * connecting to ES cluster through a client node.
+     */
+	private Client getClient() throws UnknownHostException {
+		Settings settings = Settings.settingsBuilder().put("cluster.name", cluster_name).build();
+		
 		Client client = TransportClient.builder().settings(settings).build().
-				addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-        return client;
-    }  
-    private static String INDEX_NAME="wiki";
-    private static String DOC_TYPE="wiki";
+				addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host_name), 9300));
+        
+		return client;
+    }
+	
+	
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-	throws ServletException, IOException 
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
+		//getting the user name
 		String uid="";
 		HttpSession session = req.getSession(false);
 		if(session!=null)
 			uid=session.getAttribute("userID").toString();
+		
+		//for task=search, update, add, or delete
 		String taskTitle = req.getParameter("postVariableName").trim();
-//		System.out.println(taskTitle);
-		//for getting match value
+
+		//if task=search
 		if(taskTitle.equals("gettingTheDoc"))
 		{
-			String search_str=req.getParameter("search_text");
+			String search_str=req.getParameter("search_text"); //the string to be search
 			resp.setContentType("text/html");
 			PrintWriter out = resp.getWriter();
 			
-			//fetching all the doc and putting in html format
+			//search query
 			final Client client = getClient();
 			SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
 	                .setQuery(QueryBuilders.boolQuery()
@@ -77,114 +84,82 @@ public class Conn_add_new extends HttpServlet
 	                        .should(QueryBuilders.wildcardQuery("topic_more_description", "*"+search_str+"*"))
 	                        .should(QueryBuilders.wildcardQuery("file_title","*"+search_str+"*")))
 	                .execute().actionGet();
-
-		    SearchHits searchHits = response.getHits();
-		    SearchHit[] hits = searchHits.getHits();
-//		    System.out.println(hits.length);
+			
+		    SearchHit[] hits = response.getHits().getHits(); //getting the responses
 			out.println("<span id='no-of-doc' style='display:none'>"+hits.length+"</span");
-		    for (int i = 0; i <hits.length; i++) {
-			        SearchHit hit = hits[i];
-			        Map<String, Object> result = hit.getSource();
-			        int noOfColumn=result.size();
-			    	Set s=result.keySet();
-			    	Iterator ref=s.iterator();
-				   out.println("<article id='post-1' class=' post-1 topic type-topic status-publish hentry topic-tag-basic topic-tag-suggestion'>");
-				   out.println("<header class='clearfix'>");
-				   out.println("<h3 class='post-title gotham-rounded-bold'>");
-				   out.println("<i class='doc_update_button fa fa-pencil-square-o'></i>");
-				   out.println("<span id='main-post-tile'>");
-				   //getting data from doc of elasticsearch
-				   Object topic_title = null,more_desc = null,short_desc = null,file_name = null;
-//				   System.out.println(noOfColumn);
-				   if(noOfColumn==3){
-				   ref.hasNext();
-				   Object key= ref.next();	
-				   topic_title=result.get("topic_title");
-				   
-				   ref.hasNext();
-				   key= ref.next();
-				   more_desc=result.get("topic_more_description");
-				   
-				   ref.hasNext();
-				   key= ref.next();
-				   short_desc=result.get("topic_description");
-				   }
-				   else
-				   {
-				   
-				   try {
-					   
-					   Object key= ref.next();
-					   
-					    key= ref.next();
-					    topic_title=result.get("topic_title");
-
-					   key= ref.next();	
-					   more_desc=result.get("topic_more_description");
-					   
-					   key= ref.next();
-					   short_desc=result.get("topic_description");
-					   
-					   key= ref.next();
-					   file_name=result.get("file_title");
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		    
+			for (int i = 0; i <hits.length; i++) //for each search result
+			{
+				SearchHit hit = hits[i];
+				Map<String, Object> result = hit.getSource();
+				
+				out.println("<article id='post-1' class=' post-1 topic type-topic status-publish hentry topic-tag-basic topic-tag-suggestion'>");
+				out.println("<header class='clearfix'>");
+				out.println("<h3 class='post-title gotham-rounded-bold'>");
+				out.println("<i class='doc_update_button fa fa-pencil-square-o'></i>");
+				out.println("<span id='main-post-tile'>");
+				
+				//for storing values of each field to be displayed
+				Object topic_title = null, more_desc = null, short_desc = null, file_name = null;
+				
+				topic_title=result.get("topic_title");
+				more_desc=result.get("topic_more_description");
+				short_desc=result.get("topic_description");
+				file_name=result.get("file_title");
+				
+				//displaying the required field values
+				out.println(topic_title);
+				out.println("</span>");
+				out.println("(<span class='less-description gotham-rounded-light'>");
+				out.println(short_desc);
+				out.println("");
+				out.println("</span>)");
+				out.println("</h3>");
+				out.println("</header>");
+				out.println("<p class='more-description gotham-rounded-light'>");
+				out.println(more_desc);
+				out.println("</p>");
+				
+				//displaying all the attached files.
+				if(file_name!=null)
+				{
+					String[] file_name_array=((String) file_name).split(";");
+					
+					out.println("<br/>");
+					
+					int count1=1;
+					for(String file_name_string : file_name_array)
+					{
+						out.println("<a id='download-file' href='DownloadFileServlet?file="+file_name_string+"&&id_no="+hit.getId()+"&&count1="+count1+"'>"+file_name_string+"      </a>");
+				        count1++;
+				    }
 				}
-				   }
-				   out.println(topic_title);
-				   out.println("</span>");
-				   out.println("(<span class='less-description gotham-rounded-light'>");
-				   out.println(short_desc);
-				   out.println("");
-				   out.println("</span>)");
-				   out.println("</h3>");
-				   out.println("</header>");
-				   out.println("<p class='more-description gotham-rounded-light'>");
-				   out.println(more_desc);
-				   out.println("</p>"); 
-				   if(file_name!=null){
-			            int occurrences = 0;
-			            for(char c : ((String) file_name).toCharArray()){
-			               if(c == ';'){
-			                  occurrences++;
-			               }
-			            }
-			            if(occurrences==0)
-			            {
-			            	out.println("<br/><a id='download-file' href='DownloadFileServlet?file="+file_name+"&&id_no="+hit.getId()+"&&count1="+1+"'>"+file_name+"</a>");
-			            }
-			            else{
-			            	out.println("<br/>");
-			            	String file_name_array[]=((String) file_name).split(";");
-				            int count1=1;
-				            for(String file_name_string : file_name_array)
-				            {
-				            out.println("<a id='download-file' href='DownloadFileServlet?file="+file_name_string+"&&id_no="+hit.getId()+"&&count1="+count1+"'>"+file_name_string+"      </a>");
-				            count1++;
-				            }
-			            }
-				   }
-				   out.println("</article>");
-		    }
+				
+				out.println("</article>");
+			}
 		}
 		
-		//for adding new doc
+		//if task=add
 		else if(taskTitle.equals("add"))
 		{
 			int reply = 44;
 			final Client client = getClient();
+			
+			//getting the values from the form
 			String title = req.getParameter("title");
 			String short_desc = req.getParameter("short_desc");
 			String long_desc = req.getParameter("long_desc");
 			String file_name = req.getParameter("file_name");
 			String file_contents = req.getParameter("attach_file");
+			
+			//for last_update_time
 			String dt=new Date().toString();
-			//getting the total no of doc in the index and setting id according to that.
+			
+			//searching if document already exists
 			SearchResponse response = client.prepareSearch(INDEX_NAME)
 			        .setTypes(DOC_TYPE)
 			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-			        .setQuery(QueryBuilders.matchQuery("topic_title".trim().toLowerCase(), title.trim().toLowerCase()))                 // Query
+			        .setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))                 // Query
 			        .execute()
 			        .actionGet();
 		    SearchHit[] searchresponse=response.getHits().hits();

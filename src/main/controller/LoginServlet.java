@@ -40,8 +40,8 @@ public class LoginServlet extends HttpServlet
 				HttpSession session = req.getSession(true); //starting a session.
 	            session.setAttribute("userID", usrId);
 	            
+	            //setting flag according to the user's privileges.
 	            int flag=util.flag;
-	    		
 	    		session.setAttribute("flag", flag);
 				
 	    		resp.sendRedirect("home");

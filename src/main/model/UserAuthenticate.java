@@ -40,6 +40,7 @@ public class UserAuthenticate
 				/*
 				 * if connection is made with the user name & password in the specified
 				 * domain, then return true, i.e. it is valid login.
+				 * Also, checking the privileges of the valid user.
 				 */
 				try 
 				{
@@ -72,12 +73,13 @@ public class UserAuthenticate
 							flag=1;
 					}
 					
+					String user=uid.toLowerCase();
 					/*
 					 * for Admin privilege
 					 */
-					if(uid.contentEquals("Aakriti_Mittal")
-							|| uid.contentEquals("Gautham_D_N")
-							|| uid.contentEquals("Bhanu_Singh1"))
+					if(user.contentEquals("aakriti_mittal")
+							|| user.contentEquals("gautham_d_n")
+							|| user.contentEquals("bhanu_singh1"))
 						flag=2;
 					
 					return true;

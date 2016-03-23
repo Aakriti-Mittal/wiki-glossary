@@ -14,38 +14,42 @@ import javax.servlet.http.HttpSession;
 public class HomePageServlet extends HttpServlet 
 {
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-	throws ServletException, IOException 
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
+		HttpSession session = req.getSession(false); //getting the browser session.
 		
-		
-		
-		HttpSession session = req.getSession(false);
 		if(session == null)
 		{
 			//Invalid Session; 
-			//Generate Login Page with Error Info 
+			//Generate Login Page with Error Info
 			req.setAttribute("errMsg", "In-Valid Session !!! Please Login ...");
 			RequestDispatcher dispatcher = req.getRequestDispatcher("loginErr");
 			dispatcher.forward(req, resp);
-		}else{
-			//Valid Session; 
-		resp.setContentType("text/html");
-		PrintWriter out = resp.getWriter();
-		
-		RequestDispatcher header = req.getRequestDispatcher("Header.html"); 
-		header.include(req, resp);
-		            
-		String name= req.getParameter("q");
-		out.println("<p class='add-result'>"+name+"</p>");
-		out.println("<p class='user_privilege' style='display-none'>"+session.getAttribute("flag")+"</p>");
-		
-		RequestDispatcher main = req.getRequestDispatcher("default.html");
-		main.include(req, resp);
-
-
-		RequestDispatcher footer = req.getRequestDispatcher("Footer.html");
-		footer.include(req, resp);
 		}
-	}//End of doPost
-}//End of Class
+		else
+		{
+			//Valid Session; 
+			resp.setContentType("text/html");
+			PrintWriter out = resp.getWriter();
+			
+			//displaying top(header) of the page
+			RequestDispatcher header = req.getRequestDispatcher("Header.html"); 
+			header.include(req, resp);
+		            
+			String name= req.getParameter("q");
+			out.println("<p class='add-result'>"+name+"</p>");
+			//showing contents according to the user's access.
+			out.println("<p class='user_privilege' style='display-none'>"+session.getAttribute("flag")+"</p>");
+			
+			//displaying the body of the page
+			RequestDispatcher main = req.getRequestDispatcher("default.html");
+			main.include(req, resp);
+			
+			//displaying the footer section of the page
+			RequestDispatcher footer = req.getRequestDispatcher("Footer.html");
+			footer.include(req, resp);
+		}
+		
+	}
+	
+}
