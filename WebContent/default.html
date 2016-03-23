@@ -1,0 +1,100 @@
+
+<div  class="update-div"> 
+	<i class="fa fa-times" id="update-form-close"></i>
+    <form action="Conn_add_new" class="form-signin"  method="post">
+        <input type="text" class=" input_title" name="title" id="title" placeholder="Title" required>
+        <input type="text" class=" input_short_desc" name="short_desc" id="short_desc" placeholder="Short Desc" required>    
+        <textarea class=" input_long_desc" name="long_desc" id="long_desc" placeholder="Long Desc" required></textarea>
+        <div class="loading-anime-image">  
+	      <div class="sk-fading-circle">
+	        <div class="sk-circle1 sk-circle"></div>
+	        <div class="sk-circle2 sk-circle"></div>
+	        <div class="sk-circle3 sk-circle"></div>
+	        <div class="sk-circle4 sk-circle"></div>
+	        <div class="sk-circle5 sk-circle"></div>
+	        <div class="sk-circle6 sk-circle"></div>
+	        <div class="sk-circle7 sk-circle"></div>
+	        <div class="sk-circle8 sk-circle"></div>
+	        <div class="sk-circle9 sk-circle"></div>
+	        <div class="sk-circle10 sk-circle"></div>
+	        <div class="sk-circle11 sk-circle"></div>
+	        <div class="sk-circle12 sk-circle"></div>
+	      </div>
+      	</div> 
+        <input type="file" class="input_file-upload" multiple>
+		<textarea name="attach_file" class="file-contents-stream" placeholder="Long Desc" ></textarea> 
+		<input type="text"  class="input_file-detail form-control placeholder-pro mainLoginInput" name="file_name" readonly="readonly"/>        
+        <button type="submit" class="update-button" name="postVariableName" value="update" class="btn">UPDATE</button>    
+    </form>
+</div>
+
+<div class="add-new-div"> 
+	<i class="fa fa-times" id="add-new-form-close"></i>
+    <form action="Conn_add_new" class="form-signin"  method="post">
+        <input type="text" class=" input_title" name="title"  placeholder="Title" required>
+        <input type="text" class=" input_short_desc" name="short_desc"  placeholder="Short Desc" required>    
+        <textarea class=" input_long_desc" name="long_desc" placeholder="Long Desc" required></textarea>
+     	<div class="loading-anime-image">  
+	      <div class="sk-fading-circle">
+	        <div class="sk-circle1 sk-circle"></div>
+	        <div class="sk-circle2 sk-circle"></div>
+	        <div class="sk-circle3 sk-circle"></div>
+	        <div class="sk-circle4 sk-circle"></div>
+	        <div class="sk-circle5 sk-circle"></div>
+	        <div class="sk-circle6 sk-circle"></div>
+	        <div class="sk-circle7 sk-circle"></div>
+	        <div class="sk-circle8 sk-circle"></div>
+	        <div class="sk-circle9 sk-circle"></div>
+	        <div class="sk-circle10 sk-circle"></div>
+	        <div class="sk-circle11 sk-circle"></div>
+	        <div class="sk-circle12 sk-circle"></div>
+	      </div>
+      	</div> 
+        <input type="file" class="input_file-upload" multiple>
+		<textarea name="attach_file" class="file-contents-stream" placeholder="Long Desc" ></textarea> 
+		<input type="text"  class="input_file-detail form-control placeholder-pro mainLoginInput" name="file_name" readonly="readonly"/>        
+        <button type="submit" class="add-new-button" name="postVariableName" value="add" class="btn">ADD</button> 
+    </form>
+</div> 
+ 
+<div  class="delete-div"> 
+	<i class="fa fa-times" id="delete-form-close"></i>
+    <form action="Conn_add_new" class="form-signin"  method="post">
+        <input type="text" class=" input_title" name="title" id="title" placeholder="Title" required>       
+        <button type="submit" class="delete-button" name="postVariableName" value="delete" class="btn">DELETE</button>    
+    </form>
+</div>
+
+<div id="contents-for-autocomplete" style="display:none"></div>
+
+    <div class="dell-search-div">   
+       <!-- Start of Search Wrapper -->
+        <div class="search-area-wrapper">
+            <div class="search-area">
+                <h1 class="search-header text-center text-color-white ">OMEGA & OCI WIKI !</h1>
+                <p class="search-tag-line text-center text-color-white ">What are you looking for</p>
+                    <input class="search-term" type="text" id="search-text-box" name="search-text" placeholder="Type your search terms here" title="* Please enter a search term!" />
+                    <button class="search-btn" id="dell-search-button">
+                    <i class="fa fa-search"></i><span>&nbsp;&nbsp;Search</span></button>
+
+            </div>
+        </div>
+        <!-- End of Search Wrapper -->
+    </div>
+
+<!-- Start of Page Container -->
+<div class="page-container">
+    <div class="container-fluid">
+        <div class="row">
+
+
+            <!-- start of page content -->
+            <div class="span8 main-listing">
+                <h4 class="search-title text-color-gray">Search Results for 
+                    <span class="text-color-black" id="search-title-span"></span>
+                </h4>
+                <h4 id="no-result-found">Sorry,no Results Found !</h4>
+
+<div id ="topic-list"></div>
+
+

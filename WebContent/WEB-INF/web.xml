@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>wiki</display-name>
+  <welcome-file-list>
+    <welcome-file>Login.html</welcome-file>  
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <servlet>
+    <display-name>HomePageServlet</display-name>
+    <servlet-name>HomePageServlet</servlet-name>
+    <servlet-class>main.view.HomePageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>HomePageServlet</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+
+        
+  <servlet>
+    <display-name>Conn_add_new</display-name>
+    <servlet-name>Conn_add_new</servlet-name>
+    <servlet-class>main.model.Conn_add_new</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Conn_add_new</servlet-name>
+    <url-pattern>/Conn_add_new</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <display-name>DownloadFileServlet</display-name>
+    <servlet-name>DownloadFileServlet</servlet-name>
+    <servlet-class>main.model.DownloadFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>DownloadFileServlet</servlet-name>
+    <url-pattern>/DownloadFileServlet</url-pattern> 
+  </servlet-mapping>
+  
+  <servlet>
+    <display-name>LoginServlet</display-name>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>main.controller.LoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <display-name>SessionValidator</display-name>
+    <servlet-name>SessionValidator</servlet-name>
+    <servlet-class>main.controller.SessionValidator</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>SessionValidator</servlet-name>
+    <url-pattern>/sessionValidator</url-pattern>
+  </servlet-mapping>  
+  
+  <servlet>
+    <display-name>LogoutServlet</display-name>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>main.controller.LogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <display-name>LoginErrorServlet</display-name>
+    <servlet-name>LoginErrorServlet</servlet-name>
+    <servlet-class>main.view.LoginErrorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>LoginErrorServlet</servlet-name>
+    <url-pattern>/loginErr</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

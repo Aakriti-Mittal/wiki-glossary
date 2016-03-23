@@ -1,0 +1,32 @@
+<html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Dell wiki</title>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">  
+     <!-- Bootstrap -->
+      <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="assets/font-awesome-4.5.0/css/font-awesome.css">
+
+      <link rel="stylesheet" href="assets/css/main.css">
+      <link rel="shortcut icon" type="image/ico" href="favicon.ico">
+    </head>
+	<body>
+		<div id="dw-login-form">
+			<h1 class="search-header text-center text-color-white ">Welcome to OMEGA & OCI WIKI !</h1>
+			<form action="http://localhost:8080/wiki_04/login" method="post">
+				<input id="dw-login-uid" type="text" name="uid" placeholder="User id" />
+				<BR>
+				<input id="dw-login-pwd" type="password" name="psw" placeholder="Password" />
+				<BR>
+				<select id="dw-login-domain" name="domain">
+					<option selected="selected" value="asia-pacific">Asia-Pacific</option>
+					<option value="americas">Americas</option>
+				</select>
+				<br><br>
+				<input id="dw-login-sbmt-btn" type="submit" value="Sign In" />
+			</form>
+		</div>
+	</body>
+</html>
