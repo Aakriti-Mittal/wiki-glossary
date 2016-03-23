@@ -1,15 +1,7 @@
 package main.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
@@ -32,53 +24,34 @@ import main.model.UserAuthenticate;
 public class LoginServlet extends HttpServlet
 {
 	@Override
-	protected void doPost(HttpServletRequest req, 
-						 HttpServletResponse resp)
-	throws ServletException, IOException 
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
-		//1. Get all Form Data
+		//1. Get the user name & password with domain name
 		String usrId = req.getParameter("uid");
 		String password = req.getParameter("psw");
 		String domain=req.getParameter("domain");
-		//2. Validate the Form Data
+		
+		//2. Validate the credentials
 		UserAuthenticate util = new UserAuthenticate();
 		boolean isValid = util.validate(usrId, password, domain);
 		
-		if(isValid)
+		if(isValid) //if the user is valid, start a session.
 		{
-			//3. Interact with DB to Authenticate
-				/*
-				 * I. Create the Session for the First Time
-				 */
-				HttpSession session = req.getSession(true);
-				 //setting session to expiry in 1 mins
+				HttpSession session = req.getSession(true); //starting a session.
 	            session.setAttribute("userID", usrId);
 	            
-	            Settings settings = Settings.settingsBuilder().put("cluster.name", "oci").build();
-	    		Client client = TransportClient.builder().settings(settings).build().
-	    				addTransportAddress(new InetSocketTransportAddress
-	    						(InetAddress.getByName("localhost"), 9300));
-	    		SearchResponse sr=client.prepareSearch("roles").setTypes("user")
-	    				.setQuery(QueryBuilders.wildcardQuery("name", usrId)).execute().actionGet();
+	            int flag=util.flag;
 	    		
-	    		Map<String, Object> m=sr.getHits().getHits()[0].getSource();
-	    		String value=m.get("role").toString();
-	    		
-	    		int flag=0;
-	    		if(value.contentEquals("admin"))
-	    			flag=2;
-	    		else if(value.contentEquals("update"))
-	    			flag=1;
 	    		session.setAttribute("flag", flag);
-				resp.sendRedirect("home");
 				
-			//End of Authenticate
-			
-		}else{
+	    		resp.sendRedirect("home");
+	    		//End of Authentication
+		}
+		else //invalid user
+		{
 			req.setAttribute("errMsg", "In-Valid User Name / Password");
 			RequestDispatcher dispatcher = req.getRequestDispatcher("loginErr");
 			dispatcher.forward(req, resp);
-		}//End of Validation
-		
-	}//End of doPost()
-}//End of Class
+		}
+	} //end of getting & verifying login credentials
+}
