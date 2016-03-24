@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.elasticsearch.action.get.GetRequestBuilder;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -155,7 +153,58 @@ public class Conn_add_new extends HttpServlet
 			//for last_update_time
 			String dt=new Date().toString();
 			
-			//searching if document already exists
+			//searching if document already exists by the same title
+			SearchResponse response = client.prepareSearch(INDEX_NAME)
+			        .setTypes(DOC_TYPE)
+			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+			        .setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))                 // Query
+			        .execute()
+			        .actionGet();
+		    
+			SearchHit[] searchresponse=response.getHits().hits();
+		    
+			try //if document already exists, do not insert
+		    {
+		    	searchresponse[0].getId().toString(); //even if 1 document is present
+			    reply = 66; // 66 for already available
+			}
+		    catch(ArrayIndexOutOfBoundsException ae) //if not even 1 document is present, then insert
+		    {
+		    	//insertion query
+		    	client.prepareIndex().setIndex(INDEX_NAME).setType(DOC_TYPE)
+		    			.setSource("topic_title",title, "topic_description",short_desc, 
+		    				"topic_more_description", long_desc,"file_title",file_name,
+		    				"file_content",file_contents, "lastUpdatedBy", uid, 
+		    				"lastUpdatedTime", dt)
+		    			.execute().actionGet();
+		    }
+		    finally //sending the response of successful or unsuccessful insertion
+		    { 
+				String s="home?q="+reply;
+				resp.sendRedirect(s);
+		    }
+		}
+		
+		
+		//if task=update a document
+		else if(taskTitle.equals("update"))
+		{
+			int reply = 44;
+			
+			//getting the details of the document to update
+			String title = req.getParameter("title");
+			String short_desc = req.getParameter("short_desc");
+			String long_desc = req.getParameter("long_desc");
+			String file_name = req.getParameter("file_name");
+			String file_contents = req.getParameter("attach_file");
+			
+			//for last_update_time
+			String dt=new Date().toString();
+			
+			//getting the ES client
+			final Client client = getClient();
+			
+			//gettting ID of the document
 			SearchResponse response = client.prepareSearch(INDEX_NAME)
 			        .setTypes(DOC_TYPE)
 			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
@@ -163,56 +212,27 @@ public class Conn_add_new extends HttpServlet
 			        .execute()
 			        .actionGet();
 		    SearchHit[] searchresponse=response.getHits().hits();
-		    try{
-			    searchresponse[0].getId().toString();
-			    reply = 66;//"66" for already available
-			    }
-		    catch(ArrayIndexOutOfBoundsException ae)
+		    
+		    try
 		    {
-		    	client.prepareIndex().setIndex(INDEX_NAME).setType(DOC_TYPE)
-		    	.setSource("topic_title",title, "topic_description",short_desc, "topic_more_description", long_desc,"file_title",file_name,"file_content",file_contents, "lastUpdatedBy", uid, "lastUpdatedTime", dt).execute().actionGet();
-		    }
-		    finally{ 
-				String s="home?q="+reply;
-				resp.sendRedirect(s);
-		    }
-		}
-		//for updating one doc
-		else if(taskTitle.equals("update"))
-		{
-			int reply = 44;
-			String title = req.getParameter("title");
-			String short_desc = req.getParameter("short_desc");
-			String long_desc = req.getParameter("long_desc");
-			String file_name = req.getParameter("file_name");
-			String file_contents = req.getParameter("attach_file");
-			String dt=new Date().toString();
-			final Client client = getClient();
-			//gettting id of the title and updating in the respective id
-			SearchResponse response = client.prepareSearch(INDEX_NAME)
-			        .setTypes(DOC_TYPE)
-			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-			        .setQuery(QueryBuilders.matchQuery("topic_title".trim().toLowerCase(), title.trim().toLowerCase()))                 // Query
-			        .execute()
-			        .actionGet();
-		    SearchHit[] searchresponse=response.getHits().hits();
-		    try{
-			    String id_value=searchresponse[0].getId().toString();
-			    UpdateRequest updateRequest1=null;
-			    if(file_name.length()>2){
-			    	GetRequestBuilder getRequestBuilder = client.prepareGet(INDEX_NAME, DOC_TYPE, id_value);
-					getRequestBuilder.setFields(new String[]{"file_title"});
-					GetResponse response2 = getRequestBuilder.execute().actionGet();
-					String file_name_db = response2.getField("file_title").getValue().toString();
+		    	String id_value=searchresponse[0].getId().toString(); //ID of the particular document
+			    
+		    	UpdateRequest updateRequest1=null;
+			    
+			    if(file_name.length()>2)
+			    {
+			    	//getting the file names of all the associated files
+					String file_name_db=searchresponse[0].getSource().get("file_title").toString();
 					
-					getRequestBuilder.setFields(new String[]{"file_content"});
-					GetResponse response3 = getRequestBuilder.execute().actionGet();
-					String file_contents_db = response3.getField("file_content").getValue().toString();
+					//getting the file contents of all the associated files
+					String file_contents_db = searchresponse[0].getSource().get("file_content").toString();
 					
 	            	String file_name_array[]=file_name.split(";");
 	            	String file_contents_array[]=file_contents.split(";");
+	            	
 	            	file_name="";
 					file_contents="";
+					
 					for(int index=0;index<file_name_array.length;index++)
 					{
 						if(!(file_name_db.toLowerCase().contains(file_name_array[index].toLowerCase())))
