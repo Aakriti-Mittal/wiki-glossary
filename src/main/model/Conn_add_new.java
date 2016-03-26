@@ -36,7 +36,7 @@ public class Conn_add_new extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-    private String host_name="localhost";//"u4vmotcdschap04.us.dell.com";
+    private String host_name="localhost"; //"u4vmotcdschap04.us.dell.com";
     
     /*
      * connecting to ES cluster through a client node.

@@ -29,7 +29,7 @@ public class DownloadFileServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private static String cluster_name="oci";
-    private static String host_name="localhost";//"u4vmotcdschap04.us.dell.com";
+    private static String host_name="localhost"; //"u4vmotcdschap04.us.dell.com";
     
     
 	//returns ES client. connects to ES cluster.
