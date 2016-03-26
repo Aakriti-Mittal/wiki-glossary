@@ -21,6 +21,15 @@
     <url-pattern>/home</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <display-name>DocOpenPageServlet</display-name>
+    <servlet-name>DocOpenPageServlet</servlet-name>
+    <servlet-class>main.view.DocOpenPageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping> 
+    <servlet-name>DocOpenPageServlet</servlet-name>
+    <url-pattern>/open_doc</url-pattern>
+  </servlet-mapping>
         
   <servlet>
     <display-name>Conn_add_new</display-name>
@@ -33,13 +42,13 @@
   </servlet-mapping>
   
   <servlet>
-    <display-name>DownloadFileServlet</display-name>
-    <servlet-name>DownloadFileServlet</servlet-name>
-    <servlet-class>main.model.DownloadFileServlet</servlet-class>
+    <display-name>FileOperationServlet</display-name>
+    <servlet-name>FileOperationServlet</servlet-name>
+    <servlet-class>main.model.FileOperationServlet</servlet-class>
   </servlet>
   <servlet-mapping> 
-    <servlet-name>DownloadFileServlet</servlet-name>
-    <url-pattern>/DownloadFileServlet</url-pattern> 
+    <servlet-name>FileOperationServlet</servlet-name>
+    <url-pattern>/FileOperationServlet</url-pattern> 
   </servlet-mapping>
   
   <servlet>

@@ -38,7 +38,6 @@ public class HomePageServlet extends HttpServlet
 		            
 			String name= req.getParameter("q");
 			out.println("<p class='add-result'>"+name+"</p>");
-			
 			//showing contents according to the user's access.
 			out.println("<p class='user_privilege' style='display:none'>"+session.getAttribute("flag")+"</p>");
 			

@@ -1,4 +1,19 @@
 $(document).ready(function(){
+	
+//for highlighting(bolding) the search_string
+	$.fn.wrapInTag = function(opts) {
+		  
+		  var tag = opts.tag || 'strong',
+		      words = opts.words || [],
+		      regex = RegExp(words.join('|'), 'gi'),
+		      replacement = '<'+ tag +'>$&</'+ tag +'>';
+		  
+		  return this.html(function() {
+		    return $(this).text().replace(regex, replacement);
+		  });
+		};
+
+
 //for hiding the menu options
 	var user_privilege=$(".user_privilege").text().trim();
 	if(user_privilege==2)
@@ -59,6 +74,10 @@ else
 	    	{
 	    		$("#no-result-found").show();
 	    	}
+			$('.more-description').wrapInTag({
+				  tag: 'strong',
+				  words: [search_text]
+				});
 	    },
 	    type: 'POST'
 	});
@@ -80,10 +99,13 @@ $(document).on('click', '.doc_update_button', function(){
 	if(user_privilege!=0){
 	$(".add-new-div").hide();
 	$(".delete-div").hide();
-	$(".update-div #title").val($(this).next("span").text().trim());
-	$(".update-div #short_desc").val($(this).next("span").next("span").text().trim());
+	$(".update-div #title").val($(this).parent().find("#main-post-tile").text().trim());
+	$(".update-div #short_desc").val($(this).parent().find(".less-description").text().trim());
 	$(".update-div #long_desc").val($(this).parent().parent().next("p").text().trim());
 	$(".update-div").show();
+	}
+	else{
+		alert("Sorry!! you dont have enough privilege to update...");
 	}
 });
 
@@ -96,7 +118,6 @@ $("#add-new-form-close").click(function(){
 	});
 
 $("#add_new_button").click(function(){
-	$(".update-div").hide();
 	$(".delete-div").hide();
 	$(".add-new-div").show();
 	});
@@ -104,7 +125,6 @@ $("#delete-form-close").click(function(){
 	$(".delete-div").hide();
 	});
 $("#delete_button").click(function(){
-	$(".update-div").hide();
 	$(".delete-div").show();
 	$(".add-new-div").hide();
 	});
