@@ -18,7 +18,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 
-import main.model.UserAuthenticate;
+import main.util.UserAuthenticate;
 
 
 public class LoginServlet extends HttpServlet

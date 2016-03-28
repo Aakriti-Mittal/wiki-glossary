@@ -353,6 +353,20 @@ article#dw-doc-open {
     border: none;
     background-color: aliceblue;
 }
+#dw-doc-open pre {
+    display: block;
+    padding: 9.5px;
+    padding-left: 32px;
+    margin: 0 0 10px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background: none;
+    border: none;
+    border-radius: 4px;
+}
 .glyphicon-trash:before {
     content: "\e020";
     margin-right: 5px;

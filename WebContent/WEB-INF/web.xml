@@ -34,7 +34,7 @@
   <servlet>
     <display-name>Conn_add_new</display-name>
     <servlet-name>Conn_add_new</servlet-name>
-    <servlet-class>main.model.Conn_add_new</servlet-class>
+    <servlet-class>main.util.Conn_add_new</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Conn_add_new</servlet-name>
@@ -44,7 +44,7 @@
   <servlet>
     <display-name>FileOperationServlet</display-name>
     <servlet-name>FileOperationServlet</servlet-name>
-    <servlet-class>main.model.FileOperationServlet</servlet-class>
+    <servlet-class>main.util.FileOperationServlet</servlet-class>
   </servlet>
   <servlet-mapping> 
     <servlet-name>FileOperationServlet</servlet-name>
@@ -61,15 +61,14 @@
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-    <display-name>SessionValidator</display-name>
-    <servlet-name>SessionValidator</servlet-name>
-    <servlet-class>main.controller.SessionValidator</servlet-class>
-  </servlet>
-  <servlet-mapping> 
-    <servlet-name>SessionValidator</servlet-name>
-    <url-pattern>/sessionValidator</url-pattern>
-  </servlet-mapping>  
+	<filter>  
+	<filter-name>SessionFilter</filter-name>  
+	<filter-class>main.controller.SessionFilter</filter-class>  
+	</filter>  
+	<filter-mapping>  
+	<filter-name>SessionFilter</filter-name>  
+	<url-pattern>/*</url-pattern>  
+	</filter-mapping>   
   
   <servlet>
     <display-name>LogoutServlet</display-name>

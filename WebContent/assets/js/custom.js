@@ -74,10 +74,10 @@ else
 	    	{
 	    		$("#no-result-found").show();
 	    	}
-			$('.more-description').wrapInTag({
-				  tag: 'strong',
-				  words: [search_text]
-				});
+//			$('.more-description').wrapInTag({
+//				  tag: 'strong',
+//				  words: [search_text]
+//				});
 	    },
 	    type: 'POST'
 	});
@@ -139,12 +139,15 @@ $("#dw-logout-button").click(function(){
 	var add_result=$(".add-result").text().trim();
 	if(add_result.search("44")  > -1 ){
 		alert("successfully done...");
+		window.location.replace("home");
 	}
 	else if(add_result.search("55")  > -1 ){
 		alert("sorry!! Title is not available...");
+		window.location.replace("home");
 	}
 	else if(add_result.search("66")  > -1 ){
 		alert("Failed!! Title is already present! Please update...");
+		window.location.replace("home");
 	}
 	
 /*for storing the file in es*/
@@ -194,20 +197,27 @@ $('.input_file-upload').on('change',function(){
 
 
 /*for checking session expired or not*/
-function CheckUserSession() {
-	$.ajax({
-	    url: 'sessionValidator',
-	    success:function(data){
-	    	if(data=="false")
-	    		{
-	    		window.location.replace("home");
-	    		}
-	    },
-	    type: 'POST'
-	});
-	}
-//setInterval(function(){CheckUserSession();}, 70000);
-
-$("body").click(function(){
-	CheckUserSession();
-});
+//function CheckUserSession() {
+//	$.ajax({
+//	    url: '*',
+//	    success:function(data){
+//	    	alert(data);
+//	    	if(data.search("dw-login-form")>0)
+//	    		{
+//	    		alert(1111);
+//	    		}
+//	    	else 
+//	    		{
+//	    		alert(22222);
+//	    		}
+//	    },
+//	    error: function(xhr){
+//	        alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+//	    },
+//	    type: 'POST'
+//	});
+//}
+//
+//$("body").click(function(){
+//	CheckUserSession();
+//});

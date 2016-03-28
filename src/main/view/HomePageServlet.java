@@ -17,7 +17,6 @@ public class HomePageServlet extends HttpServlet
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
 		HttpSession session = req.getSession(false); //getting the browser session.
-		
 		if(session == null)
 		{
 			//Invalid Session; 

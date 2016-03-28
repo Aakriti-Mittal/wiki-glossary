@@ -26,7 +26,8 @@ public class DocOpenPageServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-    private String host_name="localhost";//"u4vmotcdschap04.us.dell.com";
+    private String host_name="u4vmotcdschap04.us.dell.com";
+//    private String host_name="localhost";
     /*
      * connecting to ES cluster through a client node.
      */
@@ -116,9 +117,9 @@ public class DocOpenPageServlet extends HttpServlet
 			out.println("</span>)");
 			out.println("</h3>");
 			out.println("</header>");
-			out.println("<p class='more-description gotham-rounded-light'>");
+			out.println("<pre><code class='more-description gotham-rounded-light'>");
 			out.println(more_desc);
-			out.println("</p>");
+			out.println("</pre></code>");
 			//displaying all the attached files.
 			if(file_name!=null && file_name.toString().trim().length()>2)
 				{
@@ -130,7 +131,7 @@ public class DocOpenPageServlet extends HttpServlet
 						out.println("<a id='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=download'><span class='glyphicon glyphicon-download-alt' title='Download this file'></span></a>");
 						if(session.getAttribute("flag").toString().trim().equals("2"))
 						{
-						out.println("<a href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=delete'><span class='glyphicon glyphicon-trash' title='Delete this file'></span></a>");
+						out.println("<a href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=delete' onclick=\"return confirm('Do you really want to delete this file?')\"><span class='glyphicon glyphicon-trash' title='Delete this file'></span></a>");
 						}
 						out.println(count1+". "+file_name_string+"<br>");
 						
