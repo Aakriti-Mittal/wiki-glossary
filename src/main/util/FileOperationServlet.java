@@ -35,8 +35,8 @@ public class FileOperationServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private static String cluster_name="oci";
-    private static String host_name="u4vmotcdschap04.us.dell.com";
-//    private static String host_name="localhost";
+//    private static String host_name="u4vmotcdschap04.us.dell.com";
+    private static String host_name="localhost";
     
     
 	//returns ES client. connects to ES cluster.

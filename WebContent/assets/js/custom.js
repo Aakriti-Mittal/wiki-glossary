@@ -20,7 +20,7 @@ $(document).ready(function(){
 		{
 		$("#delete_button").css("display","block");
 		$("#add_new_button").css("display","block");
-		}	
+		}
 	
 /* for the autocomplete data */	
 var availableTags = [""];
@@ -101,7 +101,7 @@ $(document).on('click', '.doc_update_button', function(){
 	$(".delete-div").hide();
 	$(".update-div #title").val($(this).parent().find("#main-post-tile").text().trim());
 	$(".update-div #short_desc").val($(this).parent().find(".less-description").text().trim());
-	$(".update-div #long_desc").val($(this).parent().parent().next("p").text().trim());
+	$(".update-div #long_desc").val($("article#dw-doc-open").find(".more-description").text().trim());
 	$(".update-div").show();
 	}
 	else{
@@ -119,13 +119,16 @@ $("#add-new-form-close").click(function(){
 
 $("#add_new_button").click(function(){
 	$(".delete-div").hide();
+	$(".update-div").hide();
 	$(".add-new-div").show();
+	
 	});
 $("#delete-form-close").click(function(){
 	$(".delete-div").hide();
 	});
 $("#delete_button").click(function(){
 	$(".delete-div").show();
+	$(".update-div").hide();
 	$(".add-new-div").hide();
 	});
 $("#dw-logout-button").click(function(){

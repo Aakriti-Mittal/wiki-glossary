@@ -26,8 +26,8 @@ public class DocOpenPageServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-    private String host_name="u4vmotcdschap04.us.dell.com";
-//    private String host_name="localhost";
+//    private String host_name="u4vmotcdschap04.us.dell.com";
+    private String host_name="localhost";
     /*
      * connecting to ES cluster through a client node.
      */
@@ -61,36 +61,7 @@ public class DocOpenPageServlet extends HttpServlet
 			header.include(req, resp);
 			out.println("<p class='user_privilege' style='display:none'>"+session.getAttribute("flag")+"</p>");
 			String id_value= req.getParameter("id_value");
-			//update form
-			out.println("<div  class='update-div'> ");
-			out.println("<i class='fa fa-times' id='update-form-close'></i>");
-			out.println("<form action='Conn_add_new' class='form-signin'  method='post'>");
-			out.println("<input type='text' class='doc_id_no' name='doc_id_no' value="+id_value+" style='display:none'>");
-			out.println("<input type='text' class='input_title' name='title' id='title' placeholder='Title' required>");
-			out.println("<input type='text' class='input_short_desc' name='short_desc' id='short_desc' placeholder='Short Desc' required>    ");
-			out.println("<textarea class=' input_long_desc' name='long_desc' id='long_desc' placeholder='Long Desc' required></textarea>");
-			out.println("<div class='loading-anime-image'>  ");
-			out.println("<div class='sk-fading-circle'>");
-			out.println("<div class='sk-circle1 sk-circle'></div>");
-			out.println("<div class='sk-circle2 sk-circle'></div>");
-			out.println("<div class='sk-circle3 sk-circle'></div>");
-			out.println("<div class='sk-circle4 sk-circle'></div>");
-			out.println("<div class='sk-circle5 sk-circle'></div>");
-			out.println("<div class='sk-circle6 sk-circle'></div>");
-			out.println("<div class='sk-circle7 sk-circle'></div>");
-			out.println("<div class='sk-circle8 sk-circle'></div>");
-			out.println("<div class='sk-circle9 sk-circle'></div>");
-			out.println("<div class='sk-circle10 sk-circle'></div>");
-			out.println("<div class='sk-circle11 sk-circle'></div>");
-			out.println("<div class='sk-circle12 sk-circle'></div>");
-			out.println("</div>");
-			out.println("</div> ");
-			out.println("<input type='file' class='input_file-upload' multiple>");
-			out.println("<textarea name='attach_file' class='file-contents-stream' placeholder='Long Desc' ></textarea> ");
-			out.println("<input type='text'  class='input_file-detail form-control placeholder-pro mainLoginInput' name='file_name' readonly='readonly'/>");     
-			out.println("<button type='submit' class='update-button' name='postVariableName' value='update' class='btn'>UPDATE</button>    ");
-			out.println("</form>");
-			out.println("</div>");
+
 			//search query
 			final Client client = getClient();
 			GetResponse response = client.prepareGet(INDEX_NAME, DOC_TYPE, id_value).get();
@@ -128,7 +99,7 @@ public class DocOpenPageServlet extends HttpServlet
 				int count1=1;
 				for(String file_name_string : file_name_array)
 					{
-						out.println("<a id='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=download'><span class='glyphicon glyphicon-download-alt' title='Download this file'></span></a>");
+						out.println("<a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=download'><span class='glyphicon glyphicon-download-alt' title='Download this file'></span></a>");
 						if(session.getAttribute("flag").toString().trim().equals("2"))
 						{
 						out.println("<a href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=delete' onclick=\"return confirm('Do you really want to delete this file?')\"><span class='glyphicon glyphicon-trash' title='Delete this file'></span></a>");

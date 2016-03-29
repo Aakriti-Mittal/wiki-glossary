@@ -394,7 +394,7 @@ article#dw-doc-open {
 .topic .post-meta.clearfix {
     margin-bottom: 4px;
 }
-a#download-file {
+a.download-file {
     text-decoration: none;
     padding-left: 31px;
     font-size: 16px;
@@ -406,14 +406,12 @@ a#download-file {
 }
 .more-description{
     /*display: none;*/ 
-        margin-left: 31px;
+    margin-left: 31px;
+   	font-family: "Trebuchet MS", Arial, Sans-Serif;
 }
 .less-description{
-    /*position: absolute;*/
-    /*margin-left: 13px;*/
     font-size: 22px;
     font-weight: lighter;
-    /*margin-top: -41px;*/
 }
 #main-post-tile{
     margin-left: 3px;
@@ -422,7 +420,6 @@ a#download-file {
 
 /*for footer*/
 .dell-footer{
-    /*margin-top: 30px;*/
     height: 56px;
     padding-top: 16px;
     background-color: #0085c3;
@@ -440,7 +437,6 @@ a#download-file {
     z-index: 2;
     height: 90%;
     width: 100%;
-    background-color: #229d8e;
     background-color: #229d8e;
 }
 i#add-new-form-close {
@@ -514,25 +510,6 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 }
 /*end for form*/
 
-/*for the delete from*/
-.delete-div {
-	z-index: 2;
-	display: none;
-    position: fixed;
-    height: 90%;
-    width: 100%;
-    background-color: #229d8e;
-    background-color: #229d8e;
-}
-i#delete-form-close {
-    position: absolute;
-    top: 10%;
-    right: 5%;
-    font-size: 30px;
-    color: #fff;
-    cursor: pointer;
-}
-/*end for delete form*/
 
 /*for the update form*/
 .input_file-detail,.file-contents-stream{
@@ -545,7 +522,6 @@ i#delete-form-close {
     position: fixed;
     height: 90%;
     width: 100%;
-    background-color: #229d8e;
     background-color: #229d8e;
 }
 
@@ -616,13 +592,23 @@ i#update-form-close:hover {
 /*for the delete form*/
 
 .delete-div {
+	z-index: 2;
 	display: none;
-    position: absolute;
+    position: fixed;
     height: 60%;
     width: 100%;
-    background-color: #229d8e;
+    top: 5%;
     background-color: #229d8e;
 }
+i#delete-form-close {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+}
+
 
 .delete-div .delete-button{
     background-color: #123A40;

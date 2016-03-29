@@ -30,9 +30,12 @@ public class LoginErrorServlet extends HttpServlet
 		dispatcher.include(req, resp);
 		
 		//displaying the error message on the web page
+		if(errMsg!=null){
 		out.println("<div style='position: absolute;top: 13px;z-index: 20;left: 10;'>" +
 				"<font color='aqua' style='font-size: 20px;'>" + errMsg +
 				"</font></div>");
+		}
+	
 		
 	}//end of login error.
 }

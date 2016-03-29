@@ -38,8 +38,8 @@ public class Conn_add_new extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-    private String host_name="u4vmotcdschap04.us.dell.com";
-//    private String host_name="localhost";
+//    private String host_name="u4vmotcdschap04.us.dell.com";
+    private String host_name="localhost";
     
     /*
      * connecting to ES cluster through a client node.
@@ -141,7 +141,7 @@ public class Conn_add_new extends HttpServlet
 					int count1=1;
 					for(String file_name_string : file_name_array)
 					{
-						out.println("<a id='download-file'  title='Download this file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+hit.getId()+"&&count1="+count1+"'>"+file_name_string+"      </a>");
+						out.println("<a class='download-file'  title='Download this file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+hit.getId()+"&&count1="+count1+"'>"+file_name_string+"      </a>");
 				        count1++;
 				    }
 				}
