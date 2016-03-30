@@ -101,7 +101,7 @@ img#dell-logo {
 #dw-login-form{
     position: fixed;
     z-index: 2;
-    height: 90%;
+    height: 100%;
     width: 100%;
     background-color: #229d8e;
 }
@@ -208,7 +208,7 @@ input.input_file-upload {
 div.loading-anime-image {
     position: absolute;
     display: none;
-    bottom: 58px;
+    bottom: 40px;
     left: 50%;
     margin-left: -173px;
 }
@@ -381,7 +381,7 @@ article#dw-doc-open {
 /*   display: none;*/
     margin-top: 20px;
     padding-bottom: 20px;
-    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
 }
 .post-title img {
     width: 23px;
@@ -417,7 +417,19 @@ a.download-file {
     margin-left: 3px;
 }
 /* end of Page Container */
-
+/*for pagination*/
+.pagination-sm>li>a, .pagination-sm>li>span {
+    padding: 15px 17px;
+    background-color: #229d8e;
+    font-size: 14px;
+    color: #fff;
+}
+ul#pagination-demo {
+    display: table;
+    margin: 28px auto;
+}
+    
+/*end pagination*/
 /*for footer*/
 .dell-footer{
     height: 56px;
@@ -435,8 +447,9 @@ a.download-file {
 	display: none;	
     position: fixed;
     z-index: 2;
-    height: 90%;
+    height: 95%;
     width: 100%;
+    top: 5%;
     background-color: #229d8e;
 }
 i#add-new-form-close {
@@ -516,12 +529,21 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 	display: none;
 	opacity: 0;
 }
+div#update-file-list {
+    left: 38%;
+    top: 69%;
+    position: absolute;
+    width: 25%;
+    max-height: 88px;
+    overflow-y: auto;
+}
 .update-div {
 	z-index: 2;
 	display: none;
     position: fixed;
-    height: 90%;
+    height: 95%;
     width: 100%;
+    top: 5%;
     background-color: #229d8e;
 }
 
@@ -531,7 +553,7 @@ input:focus, textarea:focus, keygen:focus, select:focus {
     opacity: 0.8;
     position: absolute;
     left: 43%;
-    bottom: 4%;
+    bottom: 6%;
     width: 10%;
     height: 6%;
     border: none;
@@ -559,7 +581,7 @@ i#update-form-close:hover {
 .update-div  .input_title{
     position: absolute;
     width: 64%;
-    top: 16%;
+    top: 5%;
     left: 17%;
     padding: 1%;
     border: none;
@@ -568,7 +590,7 @@ i#update-form-close:hover {
 .update-div .input_short_desc {
     position: absolute;
     width: 64%;
-    top: 27%;
+    top: 16%;
     left: 17%;
     padding: 1%;
     border: none;
@@ -578,12 +600,18 @@ i#update-form-close:hover {
     position: absolute;
     width: 64%;
     height: 40%;
-    top: 38%;
+    top: 27%;
     left: 17%;
     padding: 1%;
     border: none;
     border-radius: 8px;
     resize: none;
+}
+.update-div input.input_file-upload {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    margin-left: -125px;
 }
 /*end for update form*/
 
@@ -595,7 +623,7 @@ i#update-form-close:hover {
 	z-index: 2;
 	display: none;
     position: fixed;
-    height: 60%;
+    height: 95%;
     width: 100%;
     top: 5%;
     background-color: #229d8e;
@@ -616,9 +644,9 @@ i#delete-form-close {
     opacity: 0.8;
     position: absolute;
     left: 43%;
-    top: 62%;
+    top: 56%;
     width: 10%;
-    height: 10%;
+    height: 8%;
     border: none;
     border-radius: 8px;
 }
@@ -631,7 +659,7 @@ i#delete-form-close {
 .delete-div  .input_title{
     position: absolute;
     width: 64%;
-    top: 35%;
+    top: 39%;
     left: 17%;
     padding: 1%;
     border: none;

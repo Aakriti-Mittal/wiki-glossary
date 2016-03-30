@@ -6,8 +6,9 @@ $(document).ready(function(){
 		  var tag = opts.tag || 'strong',
 		      words = opts.words || [],
 		      regex = RegExp(words.join('|'), 'gi'),
-		      replacement = '<'+ tag +'>$&</'+ tag +'>';
-		  
+//		      replacement = '<'+ tag +'>$&</'+ tag +'>';
+		      replacement = "<span style='background-color: #FFFF00'"+ "" +">$&</"+ "span" +">";
+//		  <span style="background-color: #FFFF00">CCU</span>
 		  return this.html(function() {
 		    return $(this).text().replace(regex, replacement);
 		  });
@@ -70,14 +71,15 @@ else
 	    },
 	    success:function(data){
 	    	$("#topic-list").html(data);
+	    	executePagination();
 	    	if($("#no-of-doc").text().trim()=="0")
 	    	{
 	    		$("#no-result-found").show();
 	    	}
-//			$('.more-description').wrapInTag({
-//				  tag: 'strong',
-//				  words: [search_text]
-//				});
+			$('.more-description').wrapInTag({
+				  tag: 'strong',
+				  words: [search_text]
+				});
 	    },
 	    type: 'POST'
 	});
@@ -99,6 +101,9 @@ $(document).on('click', '.doc_update_button', function(){
 	if(user_privilege!=0){
 	$(".add-new-div").hide();
 	$(".delete-div").hide();
+	$("#update-file-list").html("");
+	$("#update-file-list").append($("#doc-file-list").html());
+	$(".doc_id_no").val($("#doc_id_no2").text());
 	$(".update-div #title").val($(this).parent().find("#main-post-tile").text().trim());
 	$(".update-div #short_desc").val($(this).parent().find(".less-description").text().trim());
 	$(".update-div #long_desc").val($("article#dw-doc-open").find(".more-description").text().trim());
@@ -200,27 +205,61 @@ $('.input_file-upload').on('change',function(){
 
 
 /*for checking session expired or not*/
-//function CheckUserSession() {
-//	$.ajax({
-//	    url: '*',
-//	    success:function(data){
-//	    	alert(data);
-//	    	if(data.search("dw-login-form")>0)
-//	    		{
-//	    		alert(1111);
-//	    		}
-//	    	else 
-//	    		{
-//	    		alert(22222);
-//	    		}
-//	    },
-//	    error: function(xhr){
-//	        alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
-//	    },
-//	    type: 'POST'
-//	});
-//}
-//
-//$("body").click(function(){
-//	CheckUserSession();
-//});
+function CheckUserSession() {
+	$.ajax({
+	    url: '*',
+	    success:function(data){
+	    	if(data.search("dw-login-form")>0)
+	    		{
+	    		window.location.replace("home");
+	    		}
+	    },
+	    type: 'POST'
+	});
+}
+
+$("body").click(function(){
+	CheckUserSession();
+});
+
+/*for the pagination*/
+function executePagination(){	
+$('#pagination-demo').remove();
+$("#topic-list").after("<ul id='pagination-demo' class='pagination-sm'></ul>");
+var k=1;
+$(".topic").each(function() {
+	$(this).hide();
+	if(k>=1 && k<=10)$(this).show();
+   	else $(this).hide();
+  	k++;
+});
+$('#pagination-demo').show();
+
+var p_ttlPages;
+if($(".topic").length % 10 == 0){
+	p_ttlPages = parseInt($(".topic").length/10);	
+}
+else{
+	p_ttlPages = parseInt($(".topic").length/10) + 1;
+}
+var p_vpages=1;
+if(p_ttlPages>10) p_vpages=10;
+else if(p_ttlPages>1 && p_ttlPages<10) p_vpages=p_ttlPages;
+$('#pagination-demo').twbsPagination({
+        totalPages: p_ttlPages,
+        visiblePages: p_vpages,
+        onPageClick: function (event, page) {
+      	var i=0;
+        $(".topic").each(function(){
+       	if(i>=((page-1)*10) && i<=((page)*10))$(this).show();
+       	else $(this).hide();
+      	i++;
+     });
+        $('html, body').animate({scrollTop: '200px'},200 );
+   }
+});
+if(p_vpages==1){
+   	$('#pagination-demo').hide();
+   }
+}
+/*end for pagination*/

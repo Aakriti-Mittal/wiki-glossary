@@ -50,7 +50,7 @@
 <div  class='update-div'> 
 	<i class='fa fa-times' id='update-form-close'></i>
 	<form action='Conn_add_new' class='form-signin'  method='post'>
-		<input type='text' class='doc_id_no' name='doc_id_no' value="+id_value+" style='display:none'>
+		<input type='text' class='doc_id_no' name='doc_id_no' style='display:none'>
 		<input type='text' class='input_title' name='title' id='title' placeholder='Title' required>
 		<input type='text' class='input_short_desc' name='short_desc' id='short_desc' placeholder='Short Desc' required>    
 		<textarea class=' input_long_desc' name='long_desc' id='long_desc' placeholder='Long Desc' required></textarea>
@@ -75,6 +75,7 @@
 		<input type='text'  class='input_file-detail form-control placeholder-pro mainLoginInput' name='file_name' readonly='readonly'/>     
 		<button type='submit' class='update-button' name='postVariableName' value='update' class='btn'>UPDATE</button>    
 	</form>
+	<div id="update-file-list"></div>
 </div>
 
 <div class="add-new-div"> 

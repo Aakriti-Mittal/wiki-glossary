@@ -75,33 +75,45 @@ public class Conn_add_new extends HttpServlet
 			
 			//search query
 			final Client client = getClient();
-			SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
-					
-	                .setQuery(QueryBuilders.boolQuery()
-	                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_title", "*"+search_str+"*"))
-	                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_description", "*"+search_str+"*"))
-	                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_more_description", "*"+search_str+"*"))
-	                        .should(QueryBuilders.matchPhrasePrefixQuery("file_title","*"+search_str+"*")))
-	                .addHighlightedField("topic_more_description",0,0)
-	                .setHighlighterPreTags("<span style=\"background-color: #FFFF00\">")
-	                .setHighlighterPostTags("</span>")
-	                .execute().actionGet();
+			SearchResponse response=null;
+			if(search_str.contains(" ")){
+				response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
+		                .setQuery(QueryBuilders.boolQuery()
+		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_title", search_str))
+		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_description", search_str))
+		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_more_description", search_str))
+		                        .should(QueryBuilders.matchPhrasePrefixQuery("file_title", search_str)))
+		                .setSize(400)
+		                .execute().actionGet();
+			}
+			else{
+				response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
+		                .setQuery(QueryBuilders.boolQuery()
+		                        .should(QueryBuilders.wildcardQuery("topic_title","*"+ search_str+ "*"))
+		                        .should(QueryBuilders.wildcardQuery("topic_description", "*"+ search_str+ "*"))
+		                        .should(QueryBuilders.wildcardQuery("topic_more_description", "*"+ search_str+ "*"))
+		                        .should(QueryBuilders.wildcardQuery("file_title", "*"+ search_str+ "*")))
+		                .setSize(400)
+		                .execute().actionGet();
+			}
+
 			
 		    SearchHit[] hits = response.getHits().getHits(); //getting the responses
 			out.println("<span id='no-of-doc' style='display:none'>"+hits.length+"</span");
-		    
+			out.println("<div></div>");
+			
 			for (int i = 0; i <hits.length; i++) //for each search result
 			{
 				SearchHit hit = hits[i];
 				Map<String, HighlightField> hf = hit.getHighlightFields();
-				String id_value=hit.getId().toString();
 				Map<String, Object> result = hit.getSource();
-				
-				out.println("<article class='topic'>");
-				out.println("<header class='clearfix'>");
-				out.println("<h3 class='post-title gotham-rounded-bold'>");
-				out.println("<i class='fa fa-book'></i>");
-				out.println("<a href='open_doc?id_value="+id_value+"' target='_blank'><span id='main-post-tile'>");
+				String id_value=hit.getId().toString();
+				out.println("<article class='topic'>" +
+						"<header class='clearfix'>" +
+						"<h3 class='post-title gotham-rounded-bold'>" +
+						"<i class='fa fa-book'></i>" +
+						"<a href='open_doc?id_value="+id_value+
+						"' target='_blank'><span id='main-post-tile'>");
 				
 				//for storing values of each field to be displayed
 				Object topic_title = null, more_desc = null, short_desc = null, file_name = null;
@@ -122,8 +134,8 @@ public class Conn_add_new extends HttpServlet
 					out.println("(<span class='less-description gotham-rounded-light'>");
 					out.println(short_desc);
 					out.println("");
+					out.println("</span>)");
 				}
-				out.println("</span>)");
 				out.println("</a></h3>");
 				out.println("</header>");
 				out.println("<p class='more-description gotham-rounded-light'>");
@@ -214,7 +226,6 @@ public class Conn_add_new extends HttpServlet
 			String doc_id_no = req.getParameter("doc_id_no");
 			//for last_update_time
 			String dt=new Date().toString();
-			
 			//getting the ES client
 			final Client client = getClient();
 			

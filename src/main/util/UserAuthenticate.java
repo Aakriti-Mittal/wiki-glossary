@@ -71,11 +71,13 @@ public class UserAuthenticate
 					while (searchResults.hasMore())
 					{
 						SearchResult searchResult = searchResults.next();
+						if(searchResult.getAttributes().get("memberOf")!=null){
 						String b = searchResult.getAttributes().get("memberOf").toString();
 						if(b.contains("ETS_OM_Omega_EngMgrs") 
 								|| b.contains("ETS_OM_Omega_TPMs") 
 								|| b.contains("ETS_OM_Omega_POs"))
-							flag=1;
+							flag=2;
+						}
 					}
 					
 					String user=uid.toLowerCase();
@@ -96,6 +98,7 @@ public class UserAuthenticate
 				catch (Exception e)
 				{
 					System.out.println(e);
+					e.printStackTrace();
 				}
 				finally //closing the connection client.
 				{

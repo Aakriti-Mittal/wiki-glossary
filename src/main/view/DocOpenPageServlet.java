@@ -61,7 +61,9 @@ public class DocOpenPageServlet extends HttpServlet
 			header.include(req, resp);
 			out.println("<p class='user_privilege' style='display:none'>"+session.getAttribute("flag")+"</p>");
 			String id_value= req.getParameter("id_value");
-
+			out.println("<p id='doc_id_no2' style='display:none'>");
+			out.println(id_value);
+			out.println("</p>");
 			//search query
 			final Client client = getClient();
 			GetResponse response = client.prepareGet(INDEX_NAME, DOC_TYPE, id_value).get();
@@ -95,7 +97,7 @@ public class DocOpenPageServlet extends HttpServlet
 			if(file_name!=null && file_name.toString().trim().length()>2)
 				{
 				String[] file_name_array=((String) file_name).split(";");
-				out.println("<br/>");
+				out.println("<br/><div id='doc-file-list'>");
 				int count1=1;
 				for(String file_name_string : file_name_array)
 					{
@@ -108,6 +110,7 @@ public class DocOpenPageServlet extends HttpServlet
 						
 						count1++;
 					}
+				out.println("</div>");
 				}
 			if(lastUpdatedTime!=null && lastUpdatedTime.toString().trim().length()>2){
 				out.println("<p style='margin-top: 22px;float: right;font-size: 12px;'>This was last modified on "+lastUpdatedTime);
