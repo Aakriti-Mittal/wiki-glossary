@@ -35,6 +35,7 @@ public class LoginErrorServlet extends HttpServlet
 				"<font color='aqua' style='font-size: 20px;'>" + errMsg +
 				"</font></div>");
 		}
+	    if(out!=null)out.close();
 	
 		
 	}//end of login error.

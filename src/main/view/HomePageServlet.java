@@ -39,7 +39,7 @@ public class HomePageServlet extends HttpServlet
 			out.println("<p class='add-result'>"+name+"</p>");
 			//showing contents according to the user's access.
 			out.println("<p class='user_privilege' style='display:none'>"+session.getAttribute("flag")+"</p>");
-			
+			out.println("<p id='dw-user-id' style='display:none'>"+session.getAttribute("userID")+"</p>");
 			//displaying the body of the page
 			RequestDispatcher main = req.getRequestDispatcher("default.html");
 			main.include(req, resp);
@@ -47,6 +47,7 @@ public class HomePageServlet extends HttpServlet
 			//displaying the footer section of the page
 			RequestDispatcher footer = req.getRequestDispatcher("Footer.html");
 			footer.include(req, resp);
+		    if(out!=null)out.close();
 		}
 		
 	}

@@ -19,9 +19,11 @@ $(document).ready(function(){
 	var user_privilege=$(".user_privilege").text().trim();
 	if(user_privilege==2)
 		{
-		$("#delete_button").css("display","block");
-		$("#add_new_button").css("display","block");
+		$("#delete_button,#add_new_button").css("display","block");
 		}
+	else {
+		$("#delete_button,#add_new_button").remove();
+	}
 	
 /* for the autocomplete data */	
 var availableTags = [""];
@@ -71,10 +73,12 @@ else
 	    },
 	    success:function(data){
 	    	$("#topic-list").html(data);
-	    	executePagination();
-	    	if($("#no-of-doc").text().trim()=="0")
+	    	if($(".topic").length==0)
 	    	{
 	    		$("#no-result-found").show();
+	    	}
+	    	else{
+	    		executePagination();
 	    	}
 			$('.more-description').wrapInTag({
 				  tag: 'strong',
@@ -115,10 +119,18 @@ $(document).on('click', '.doc_update_button', function(){
 });
 
 $("#update-form-close").click(function(){
+	$(".update-div .input_title").val("");
+	$(".update-div .input_short_desc").val("");
+	$(".update-div .input_long_desc").val("");
+	$(".update-div .input_file-upload").val("");
 	$(".update-div").hide();
 	});
 
 $("#add-new-form-close").click(function(){
+	$(".add-new-div .input_title").val("");
+	$(".add-new-div .input_short_desc").val("");
+	$(".add-new-div .input_long_desc").val("");
+	$(".add-new-div .input_file-upload").val("");
 	$(".add-new-div").hide();
 	});
 
@@ -129,6 +141,7 @@ $("#add_new_button").click(function(){
 	
 	});
 $("#delete-form-close").click(function(){
+	$(".delete-div .input_title").val("");
 	$(".delete-div").hide();
 	});
 $("#delete_button").click(function(){
@@ -205,22 +218,22 @@ $('.input_file-upload').on('change',function(){
 
 
 /*for checking session expired or not*/
-function CheckUserSession() {
-	$.ajax({
-	    url: '*',
-	    success:function(data){
-	    	if(data.search("dw-login-form")>0)
-	    		{
-	    		window.location.replace("home");
-	    		}
-	    },
-	    type: 'POST'
-	});
-}
-
-$("body").click(function(){
-	CheckUserSession();
-});
+//function CheckUserSession() {
+//	$.ajax({
+//	    url: 'home',
+//	    success:function(data){
+//	    	if(data.search("dw-login-form")>0)
+//	    		{
+//	    		window.location.replace("home");
+//	    		}
+//	    },
+//	    type: 'POST'
+//	});
+//}
+//
+//$("body").click(function(){
+//	CheckUserSession();
+//});
 
 /*for the pagination*/
 function executePagination(){	
@@ -263,3 +276,4 @@ if(p_vpages==1){
    }
 }
 /*end for pagination*/
+$("#dw-user-name").text($("#dw-user-id").text());

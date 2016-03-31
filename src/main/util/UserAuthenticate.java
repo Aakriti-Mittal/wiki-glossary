@@ -13,13 +13,13 @@ import javax.naming.directory.SearchResult;
 public class UserAuthenticate 
 {
 	public int flag=0; // "0" is for who will not get update functionality
-	public boolean validate(String uid, String pass, String udomain)
-	{
-		flag=2;
-		return true;
-	}
+//	public boolean validate(String uid, String pass, String udomain)
+//	{
+//		flag=2;
+//		return true;
+//	}
 	//for checking user authentication
-	public boolean validate1(String uid, String pass, String udomain)
+	public boolean validate(String uid, String pass, String udomain)
 	{
 		if(uid==null || uid.trim().isEmpty()) //no user name entered
 			return false; //invalid
@@ -86,7 +86,9 @@ public class UserAuthenticate
 					 */
 					if(user.contentEquals("aakriti_mittal")
 							|| user.contentEquals("gautham_d_n")
-							|| user.contentEquals("bhanu_singh1"))
+							|| user.contentEquals("bhanu_singh1")
+							|| user.contentEquals("pujari_vineet_kumar")
+							|| user.contentEquals("sasanka_talukder"))
 						flag=2;
 					
 					return true;

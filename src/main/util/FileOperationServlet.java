@@ -35,8 +35,8 @@ public class FileOperationServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private static String cluster_name="oci";
-//    private static String host_name="u4vmotcdschap04.us.dell.com";
-    private static String host_name="localhost";
+    private static String host_name="u4vmotcdschap04.us.dell.com";
+//    private static String host_name="localhost";
     
     
 	//returns ES client. connects to ES cluster.
@@ -110,6 +110,7 @@ public class FileOperationServlet extends HttpServlet
 			    OutputStream outStream = resp.getOutputStream();
 			    outStream.write(sample, 0, sample.length);
 			    outStream.close();
+			    if(client!=null)client.close();
 				} 
 			else if(operation_name.contentEquals("delete"))
 			{
@@ -167,6 +168,7 @@ public class FileOperationServlet extends HttpServlet
 					e.printStackTrace();
 				}
 				finally{
+					if(client!=null)client.close();
 					String s="open_doc?id_value="+topic_id_no;
 					resp.sendRedirect(s);
 				}

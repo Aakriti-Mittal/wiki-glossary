@@ -38,8 +38,8 @@ public class Conn_add_new extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-//    private String host_name="u4vmotcdschap04.us.dell.com";
-    private String host_name="localhost";
+    private String host_name="u4vmotcdschap04.us.dell.com";
+//    private String host_name="localhost";
     
     /*
      * connecting to ES cluster through a client node.
@@ -99,8 +99,6 @@ public class Conn_add_new extends HttpServlet
 
 			
 		    SearchHit[] hits = response.getHits().getHits(); //getting the responses
-			out.println("<span id='no-of-doc' style='display:none'>"+hits.length+"</span");
-			out.println("<div></div>");
 			
 			for (int i = 0; i <hits.length; i++) //for each search result
 			{
@@ -160,6 +158,8 @@ public class Conn_add_new extends HttpServlet
 				
 				out.println("</article>");
 			}
+			if(out!=null)out.close();
+			if(client!=null)client.close();
 		} //end of searching a document
 		
 		//if task=add
@@ -206,6 +206,7 @@ public class Conn_add_new extends HttpServlet
 		    }
 		    finally //sending the response of successful or unsuccessful insertion
 		    { 
+		    	if(client!=null)client.close();
 				String s="home?q="+reply;
 				resp.sendRedirect(s);
 		    }
@@ -305,6 +306,7 @@ public class Conn_add_new extends HttpServlet
 		    }
 		    finally //sending the response of successful or unsuccessful updation
 		    {
+		    	if(client!=null)client.close();
 				String s="home?q="+reply;
 				resp.sendRedirect(s);
 		    }
@@ -338,6 +340,7 @@ public class Conn_add_new extends HttpServlet
 	    	}
 	    	finally  //sending the response of successful or unsuccessful deletion
 	    	{
+	    		if(client!=null)client.close();
 				String s="home?q="+reply;
 				resp.sendRedirect(s);
 		    }
@@ -366,6 +369,8 @@ public class Conn_add_new extends HttpServlet
 		    	Object topic_title = hits[i].getSource().get("topic_title");
 			    out.println("<span class='doc-title-value'>"+topic_title+"</span>");
 		    }
+		    if(client!=null)client.close();
+		    if(out!=null)out.close();
 		} //end of the Auto-Complete
 	}//End of doPost
     
@@ -388,7 +393,7 @@ public class Conn_add_new extends HttpServlet
 		try {
 		for(int i=0;i<str1.length;i++){
 			if(j<4){
-				if(str1[i].contains(search_string))
+				if((str1[i].toLowerCase()).contains(search_string.toLowerCase()))
 				{
 					flag=1;
 					flag2=0;

@@ -26,8 +26,8 @@ public class DocOpenPageServlet extends HttpServlet
     private String INDEX_NAME="wiki";
     private String DOC_TYPE="wiki";
     private String cluster_name="oci";
-//    private String host_name="u4vmotcdschap04.us.dell.com";
-    private String host_name="localhost";
+    private String host_name="u4vmotcdschap04.us.dell.com";
+//    private String host_name="localhost";
     /*
      * connecting to ES cluster through a client node.
      */
@@ -59,6 +59,7 @@ public class DocOpenPageServlet extends HttpServlet
 			//displaying top(header) of the page
 			RequestDispatcher header = req.getRequestDispatcher("Header.html"); 
 			header.include(req, resp);
+			out.println("<p id='dw-user-id' style='display:none'>"+session.getAttribute("userID")+"</p>");
 			out.println("<p class='user_privilege' style='display:none'>"+session.getAttribute("flag")+"</p>");
 			String id_value= req.getParameter("id_value");
 			out.println("<p id='doc_id_no2' style='display:none'>");
@@ -84,10 +85,13 @@ public class DocOpenPageServlet extends HttpServlet
 			//displaying the required field values
 			out.println(topic_title);
 			out.println("</span>");
-			out.println("(<span class='less-description gotham-rounded-light'>");
-			out.println(short_desc);
-			out.println("");
-			out.println("</span>)");
+			if(short_desc.toString().trim().length()>1)
+			{
+				out.println("(<span class='less-description gotham-rounded-light'>");
+				out.println(short_desc);
+				out.println("");
+				out.println("</span>)");
+			}
 			out.println("</h3>");
 			out.println("</header>");
 			out.println("<pre><code class='more-description gotham-rounded-light'>");
@@ -122,6 +126,8 @@ public class DocOpenPageServlet extends HttpServlet
 			//displaying the footer section of the page
 			RequestDispatcher footer = req.getRequestDispatcher("Footer.html");
 			footer.include(req, resp);
+			if(client!=null)client.close();
+		    if(out!=null)out.close();
 		}
 		
 	}

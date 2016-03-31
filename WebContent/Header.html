@@ -30,14 +30,20 @@
                 <ul class="nav navbar-nav navbar-left">
                </ul>
                 <ul class="nav navbar-nav navbar-right">
-                <li>
-                     <a  id="delete_button">Delete</a>
-                  </li> 
-	              <li>
+                  <li>
                      <a  id="add_new_button">Add New</a>
                   </li>  
+               	  <li>
+                     <a  id="delete_button">Delete</a>
+                  </li> 
                   <li>
-                     <a  id="dw-logout-button">Logout</a>
+                    <div class="dropdown">
+					    <button class="dw-account-btn" type="button" data-toggle="dropdown">
+					    <span id="dw-user-name"></span>&nbsp;<span class="caret"></span></button>
+					    <ul class="dropdown-menu dw-account-ul">
+					      <li><a id="dw-logout-button">Logout</a></li>
+					    </ul>
+					  </div>
                   </li>   
                 </ul>
              </div><!-- /.navbar-collapse -->
@@ -49,7 +55,7 @@
 
 <div  class='update-div'> 
 	<i class='fa fa-times' id='update-form-close'></i>
-	<form action='Conn_add_new' class='form-signin'  method='post'>
+	<form action='Conn_add_new' class='dw-update-form'  method='post'>
 		<input type='text' class='doc_id_no' name='doc_id_no' style='display:none'>
 		<input type='text' class='input_title' name='title' id='title' placeholder='Title' required>
 		<input type='text' class='input_short_desc' name='short_desc' id='short_desc' placeholder='Short Desc' required>    
@@ -80,7 +86,7 @@
 
 <div class="add-new-div"> 
 	<i class="fa fa-times" id="add-new-form-close"></i>
-    <form action="Conn_add_new" class="form-signin"  method="post">
+    <form action="Conn_add_new" class="dw-add-new-form"  method="post">
         <input type="text" class=" input_title" name="title"  placeholder="Title" required>
         <input type="text" class=" input_short_desc" name="short_desc"  placeholder="Short Desc" required>    
         <textarea class=" input_long_desc" name="long_desc" placeholder="Long Desc" required></textarea>
@@ -109,7 +115,7 @@
  
 <div  class="delete-div"> 
 	<i class="fa fa-times" id="delete-form-close"></i>
-    <form action="Conn_add_new" class="form-signin"  method="post">
+    <form action="Conn_add_new" class="dw-delete-form"  method="post">
         <input type="text" class=" input_title" name="title" id="title" placeholder="Title" required>       
         <button type="submit" class="delete-button" name="postVariableName" value="delete" class="btn">DELETE</button>    
     </form>
