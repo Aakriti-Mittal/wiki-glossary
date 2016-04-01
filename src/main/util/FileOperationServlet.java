@@ -1,6 +1,5 @@
 package main.util;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,19 +8,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
-import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -112,67 +106,6 @@ public class FileOperationServlet extends HttpServlet
 			    outStream.close();
 			    if(client!=null)client.close();
 				} 
-			else if(operation_name.contentEquals("delete"))
-			{
-				//getting the user name
-				String uid="";
-				HttpSession session = req.getSession(false);
-				if(session!=null)
-					uid=session.getAttribute("userID").toString();
-				
-				UpdateRequest updateRequest=null;
-				GetResponse response = client.prepareGet(INDEX_NAME, DOC_TYPE, topic_id_no).get();
-				Map<String, Object> result=response.getSource();
-				//for storing values of each field to be displayed
-				
-				//for last_update_time
-				String dt=new Date().toString();
-				
-				Object file_name_db = null, file_contents_db = null;
-				file_name_db=result.get("file_title");
-				file_contents_db=result.get("file_content");
-				
-            	String file_name_array[]=((String) file_name_db).split(";");
-            	
-            	//separating all the file contents attached with the document
-            	String file_contents_array[]=((String) file_contents_db).split(";");
-            	
-            	String file_name="";
-            	String file_contents="";
-				
-				/*
-				 * checking if any files, newly added, are previously attached or not.
-				 * Accordingly, append the file names & contents
-				 */
-				for(int index=0; index < file_name_array.length; index++)
-				{
-					if(!file_name_array[index].contentEquals(fileName))
-					{
-						file_name=file_name+file_name_array[index]+";";
-						file_contents=file_contents+file_contents_array[index]+";";
-					}
-				}
-				updateRequest = new UpdateRequest(INDEX_NAME, DOC_TYPE, topic_id_no).doc(jsonBuilder()
-				        .startObject()
-				        .field("file_title", file_name)
-				        .field("file_content", file_contents)
-				        .field("lastUpdatedBy", uid)
-				        .field("lastUpdatedTime", dt)
-				        .endObject());
-				try
-				{
-					client.update(updateRequest).get(); //executing the update query
-				} 
-				catch (Exception e) 
-				{
-					e.printStackTrace();
-				}
-				finally{
-					if(client!=null)client.close();
-					String s="open_doc?id_value="+topic_id_no;
-					resp.sendRedirect(s);
-				}
-			}
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();

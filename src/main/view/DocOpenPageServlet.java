@@ -105,12 +105,8 @@ public class DocOpenPageServlet extends HttpServlet
 				int count1=1;
 				for(String file_name_string : file_name_array)
 					{
-						out.println("<a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=download'><span class='glyphicon glyphicon-download-alt' title='Download this file'></span></a>");
-						if(session.getAttribute("flag").toString().trim().equals("2"))
-						{
-						out.println("<a href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=delete' onclick=\"return confirm('Do you really want to delete this file?')\"><span class='glyphicon glyphicon-trash' title='Delete this file'></span></a>");
-						}
-						out.println(count1+". "+file_name_string+"<br>");
+						out.println("<span><a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+response.getId()+"&&count1="+count1+"&&operation=download'><span class='glyphicon glyphicon-download-alt' title='Download this file'></span></a>");
+						out.println(count1+". "+file_name_string+"<br></span>");
 						
 						count1++;
 					}

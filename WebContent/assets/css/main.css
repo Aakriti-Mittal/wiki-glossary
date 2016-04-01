@@ -383,11 +383,7 @@ article#dw-doc-open {
     border: none;
     border-radius: 4px;
 }
-.glyphicon-trash:before {
-    content: "\e020";
-    margin-right: 5px;
-    color: blue;
-}
+
 .glyphicon-download-alt:before {
     content: "\e025";
     margin-right: 10px;
@@ -439,6 +435,9 @@ a.download-file {
     background-color: #229d8e;
     font-size: 14px;
     color: #fff;
+}
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+    z-index: 1;
 }
 ul#pagination-demo {
     display: table;
@@ -541,18 +540,29 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 
 
 /*for the update form*/
+span.fa.fa-trash {
+    font-size: 16px;
+    color: black;
+    margin-right: 8px;
+    cursor: pointer;
+}
 .input_file-detail,.file-contents-stream{
 	display: none;
 	opacity: 0;
 }
 div#update-file-list {
-    left: 38%;
+    left: 43%;
     top: 69%;
     position: absolute;
     width: 25%;
     max-height: 88px;
     overflow-y: auto;
 }
+@media (min-width: 768px){
+#successUpdateModal .modal-dialog {
+    width: 347px;
+    margin: 30px auto;
+}}
 .update-div {
 	z-index: 2;
 	display: none;

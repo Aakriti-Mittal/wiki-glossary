@@ -55,7 +55,6 @@
 
 <div  class='update-div'> 
 	<i class='fa fa-times' id='update-form-close'></i>
-	<form action='Conn_add_new' class='dw-update-form'  method='post'>
 		<input type='text' class='doc_id_no' name='doc_id_no' style='display:none'>
 		<input type='text' class='input_title' name='title' id='title' placeholder='Title' required>
 		<input type='text' class='input_short_desc' name='short_desc' id='short_desc' placeholder='Short Desc' required>    
@@ -80,7 +79,6 @@
 		<textarea name='attach_file' class='file-contents-stream' placeholder='Long Desc' ></textarea> 
 		<input type='text'  class='input_file-detail form-control placeholder-pro mainLoginInput' name='file_name' readonly='readonly'/>     
 		<button type='submit' class='update-button' name='postVariableName' value='update' class='btn'>UPDATE</button>    
-	</form>
 	<div id="update-file-list"></div>
 </div>
 
@@ -120,3 +118,39 @@
         <button type="submit" class="delete-button" name="postVariableName" value="delete" class="btn">DELETE</button>    
     </form>
 </div>
+
+
+<div class="container">
+  <!-- Modal -->
+  <div class="modal fade" id="successUpdateModal" role="dialog">
+    <div class="modal-dialog">    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-body">
+          <h4 style="text-align:center">Succesfully Updated</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id="closeSuccessUpdateModal" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Modal -->
+  <div class="modal fade" id="successModal" role="dialog">
+    <div class="modal-dialog">    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-body">
+          <h4 style="text-align:center">Succesfully Updated</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id="closeSuccessModal" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

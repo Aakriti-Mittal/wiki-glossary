@@ -6,9 +6,7 @@ $(document).ready(function(){
 		  var tag = opts.tag || 'strong',
 		      words = opts.words || [],
 		      regex = RegExp(words.join('|'), 'gi'),
-//		      replacement = '<'+ tag +'>$&</'+ tag +'>';
 		      replacement = "<span style='background-color: #FFFF00'"+ "" +">$&</"+ "span" +">";
-//		  <span style="background-color: #FFFF00">CCU</span>
 		  return this.html(function() {
 		    return $(this).text().replace(regex, replacement);
 		  });
@@ -51,7 +49,8 @@ $(function() {
 
 /* main search function*/
 function postSearchFunction(){
-	setTimeout(function () { $("ul#ui-id-1, ul#ui-id-2, ul#ui-id-3").hide(); }, 1000);
+	$('#pagination-demo').remove();
+	setTimeout(function () { $("ul#ui-id-1, ul#ui-id-2, ul#ui-id-3").hide(); }, 500);
 	$("#no-result-found").hide();
 	var search_text = $("#search-text-box").val();
 	search_text=search_text.trim().toLowerCase();
@@ -76,6 +75,7 @@ else
 	    	if($(".topic").length==0)
 	    	{
 	    		$("#no-result-found").show();
+		    	$('#pagination-demo').remove();
 	    	}
 	    	else{
 	    		executePagination();
@@ -105,8 +105,24 @@ $(document).on('click', '.doc_update_button', function(){
 	if(user_privilege!=0){
 	$(".add-new-div").hide();
 	$(".delete-div").hide();
+	
 	$("#update-file-list").html("");
-	$("#update-file-list").append($("#doc-file-list").html());
+	var i=0;
+	$("div#doc-file-list span").each(function(){
+		if(i%2==0)
+		$("#update-file-list").append("<span class='fa fa-trash' title='Delete this file'></span><span>"+$(this).text().trim()+"</span></br>");
+		i++;
+	});
+$("span.fa.fa-trash").click(function(){
+	if($(this).hasClass("selected")){
+		$(this).css("color","black");
+		$(this).removeClass("selected");
+	}
+	else{
+	$(this).css("color","red");
+	$(this).addClass("selected");
+	}
+});	
 	$(".doc_id_no").val($("#doc_id_no2").text());
 	$(".update-div #title").val($(this).parent().find("#main-post-tile").text().trim());
 	$(".update-div #short_desc").val($(this).parent().find(".less-description").text().trim());
@@ -117,7 +133,55 @@ $(document).on('click', '.doc_update_button', function(){
 		alert("Sorry!! you dont have enough privilege to update...");
 	}
 });
+var doc_id_no;
+$(".update-div .update-button").click(function(){
+	var doc_title = $(".update-div #title").val();
+	var doc_short_desc = $(".update-div #short_desc").val();
+	var doc_more_desc = $(".update-div #long_desc").val();
+	doc_id_no = $("#doc_id_no2").text().trim();
+	var file_name = $(".update-div .input_file-detail").val();
+	var attach_file = $(".update-div .file-contents-stream").val();
+	var file_count_delete="";
+	var i=1;
+	$("span.fa.fa-trash").each(function(){
+		if($(this).hasClass("selected")){
+			file_count_delete=file_count_delete+i+";";
+		}
+		i++;
+	});	
+	if(doc_title.trim().length != 0 && doc_short_desc.trim().length != 0 && doc_more_desc.trim().length != 0)
+		{
+			$.ajax({
+			    url: 'Conn_add_new',
+			    data: {
+			        postVariableName: "update",
+			        doc_id_no: doc_id_no,
+			        title: doc_title,
+			        short_desc: doc_short_desc,
+			        long_desc: doc_more_desc,
+			        file_name: file_name,
+			        attach_file: attach_file,
+			        file_count_delete: file_count_delete
+			    },
+			    success:function(data){
+			    	$("#successUpdateModal").modal();
+			    },
+			    error: function(xhr, textStatus, errorThrown){
+			        alert('Sorry! request failed');
+			        window.location.replace("open_doc?id_value="+doc_id_no);
+			     },
+			    type: 'POST'
+			});
+		}
+	else{
+		alert("Please fill all field !!!");
+	}
 
+});
+
+$("#closeSuccessUpdateModal").click(function(){
+	window.location.replace("open_doc?id_value="+doc_id_no);
+});
 $("#update-form-close").click(function(){
 	$(".update-div .input_title").val("");
 	$(".update-div .input_short_desc").val("");
@@ -138,7 +202,6 @@ $("#add_new_button").click(function(){
 	$(".delete-div").hide();
 	$(".update-div").hide();
 	$(".add-new-div").show();
-	
 	});
 $("#delete-form-close").click(function(){
 	$(".delete-div .input_title").val("");
@@ -153,23 +216,24 @@ $("#dw-logout-button").click(function(){
 	window.location.replace("logout");
 });
 
-
-
-
   /*for the acknowledgement for the task eq-adding,updating*/
 	var add_result=$(".add-result").text().trim();
 	if(add_result.search("44")  > -1 ){
-		alert("successfully done...");
-		window.location.replace("home");
+		$("#successModal h4").text("Successfully done...");
+		$("#successModal").modal();
 	}
 	else if(add_result.search("55")  > -1 ){
-		alert("sorry!! Title is not available...");
-		window.location.replace("home");
+		$("#successModal h4").text("sorry!! Title is not available...");
+		$("#successModal").modal();
 	}
 	else if(add_result.search("66")  > -1 ){
-		alert("Failed!! Title is already present! Please update...");
-		window.location.replace("home");
+		$("#successModal h4").text("Failed!! Title is already present! Please update...");
+		$("#successModal").modal();
 	}
+	
+	$("#closeSuccessModal").click(function(){
+		window.location.replace("home");
+	});	
 	
 /*for storing the file in es*/
     var file_value="";
@@ -237,43 +301,42 @@ $('.input_file-upload').on('change',function(){
 
 /*for the pagination*/
 function executePagination(){	
-$('#pagination-demo').remove();
-$("#topic-list").after("<ul id='pagination-demo' class='pagination-sm'></ul>");
-var k=1;
-$(".topic").each(function() {
-	$(this).hide();
-	if(k>=1 && k<=10)$(this).show();
-   	else $(this).hide();
-  	k++;
-});
-$('#pagination-demo').show();
-
-var p_ttlPages;
-if($(".topic").length % 10 == 0){
-	p_ttlPages = parseInt($(".topic").length/10);	
-}
-else{
-	p_ttlPages = parseInt($(".topic").length/10) + 1;
-}
-var p_vpages=1;
-if(p_ttlPages>10) p_vpages=10;
-else if(p_ttlPages>1 && p_ttlPages<10) p_vpages=p_ttlPages;
-$('#pagination-demo').twbsPagination({
-        totalPages: p_ttlPages,
-        visiblePages: p_vpages,
-        onPageClick: function (event, page) {
-      	var i=0;
-        $(".topic").each(function(){
-       	if(i>=((page-1)*10) && i<=((page)*10))$(this).show();
-       	else $(this).hide();
-      	i++;
-     });
-        $('html, body').animate({scrollTop: '200px'},200 );
-   }
-});
-if(p_vpages==1){
-   	$('#pagination-demo').hide();
-   }
+		$("#topic-list").after("<ul id='pagination-demo' class='pagination-sm'></ul>");
+		var k=1;
+		$(".topic").each(function() {
+			$(this).hide();
+			if(k>=1 && k<=10)$(this).show();
+		   	else $(this).hide();
+		  	k++;
+		});
+		$('#pagination-demo').show();
+		
+		var p_ttlPages;
+		if($(".topic").length % 10 == 0){
+			p_ttlPages = parseInt($(".topic").length/10);	
+		}
+		else{
+			p_ttlPages = parseInt($(".topic").length/10) + 1;
+		}
+		var p_vpages=1;
+		if(p_ttlPages>10) p_vpages=10;
+		else if(p_ttlPages>1 && p_ttlPages<10) p_vpages=p_ttlPages;
+		$('#pagination-demo').twbsPagination({
+		        totalPages: p_ttlPages,
+		        visiblePages: p_vpages,
+		        onPageClick: function (event, page) {
+		      	var i=0;
+		        $(".topic").each(function(){
+		       	if(i>=((page-1)*10) && i<=((page)*10))$(this).show();
+		       	else $(this).hide();
+		      	i++;
+		     });
+		        $('html, body').animate({scrollTop: '200px'},200 );
+		   }
+		});
+		if(p_vpages==1){
+		   	$('#pagination-demo').hide();
+		   }
 }
 /*end for pagination*/
 $("#dw-user-name").text($("#dw-user-id").text());

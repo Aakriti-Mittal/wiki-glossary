@@ -29,7 +29,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.highlight.HighlightField;
 
 
 public class Conn_add_new extends HttpServlet 
@@ -71,145 +70,155 @@ public class Conn_add_new extends HttpServlet
 		{
 			String search_str=req.getParameter("search_text"); //the string to be search
 			resp.setContentType("text/html");
-			PrintWriter out = resp.getWriter();
 			
-			//search query
-			final Client client = getClient();
-			SearchResponse response=null;
-			if(search_str.contains(" ")){
-				response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
-		                .setQuery(QueryBuilders.boolQuery()
-		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_title", search_str))
-		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_description", search_str))
-		                        .should(QueryBuilders.matchPhrasePrefixQuery("topic_more_description", search_str))
-		                        .should(QueryBuilders.matchPhrasePrefixQuery("file_title", search_str)))
-		                .setSize(400)
-		                .execute().actionGet();
-			}
-			else{
-				response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
-		                .setQuery(QueryBuilders.boolQuery()
-		                        .should(QueryBuilders.wildcardQuery("topic_title","*"+ search_str+ "*"))
-		                        .should(QueryBuilders.wildcardQuery("topic_description", "*"+ search_str+ "*"))
-		                        .should(QueryBuilders.wildcardQuery("topic_more_description", "*"+ search_str+ "*"))
-		                        .should(QueryBuilders.wildcardQuery("file_title", "*"+ search_str+ "*")))
-		                .setSize(400)
-		                .execute().actionGet();
-			}
-
-			
-		    SearchHit[] hits = response.getHits().getHits(); //getting the responses
-			
-			for (int i = 0; i <hits.length; i++) //for each search result
+			try(PrintWriter out = resp.getWriter())
 			{
-				SearchHit hit = hits[i];
-				Map<String, HighlightField> hf = hit.getHighlightFields();
-				Map<String, Object> result = hit.getSource();
-				String id_value=hit.getId().toString();
-				out.println("<article class='topic'>" +
-						"<header class='clearfix'>" +
-						"<h3 class='post-title gotham-rounded-bold'>" +
-						"<i class='fa fa-book'></i>" +
-						"<a href='open_doc?id_value="+id_value+
-						"' target='_blank'><span id='main-post-tile'>");
-				
-				//for storing values of each field to be displayed
-				Object topic_title = null, more_desc = null, short_desc = null, file_name = null;
-				
-				topic_title=result.get("topic_title");
-				if(!hf.isEmpty())
-					more_desc=hf.get("topic_more_description").getFragments()[0];
-				else
-					more_desc=result.get("topic_more_description");
-				short_desc=result.get("topic_description");
-				file_name=result.get("file_title");
-				
-				//displaying the required field values
-				out.println(topic_title);
-				out.println("</span>");
-				if(short_desc.toString().trim().length()>1)
+				//search query
+				try(Client client = getClient()) //getting the ES connection
 				{
-					out.println("(<span class='less-description gotham-rounded-light'>");
-					out.println(short_desc);
-					out.println("");
-					out.println("</span>)");
-				}
-				out.println("</a></h3>");
-				out.println("</header>");
-				out.println("<p class='more-description gotham-rounded-light'>");
-				String short_more_dec=loadSubstringFromDesc(more_desc.toString(),search_str);
-				out.println(short_more_dec);
-				out.println("</p>");
-				
-				//displaying all the attached files.
-				if(file_name!=null && file_name.toString().trim().length()>2)
-				{
-					String[] file_name_array=((String) file_name).split(";");
+					SearchResponse response=null;
+					if(search_str.contains(" ")){			//search_string if contains two words, then use this query
+						response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
+								//search for the text in these fields only
+								.setQuery(QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchPhrasePrefixQuery("topic_title", search_str))
+										.should(QueryBuilders.matchPhrasePrefixQuery("topic_description", search_str))
+										.should(QueryBuilders.matchPhrasePrefixQuery("topic_more_description", search_str))
+										.should(QueryBuilders.matchPhrasePrefixQuery("file_title", search_str)))
+								.setSize(1000)					//return 1000 documents in the results
+								.execute().actionGet();
+					}
+					else{									//if search_string contains only one word, then use this query
+						response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
+								//search for the text in these fields only
+								.setQuery(QueryBuilders.boolQuery()
+										.should(QueryBuilders.wildcardQuery("topic_title","*"+ search_str+ "*"))
+										.should(QueryBuilders.wildcardQuery("topic_description", "*"+ search_str+ "*"))
+										.should(QueryBuilders.wildcardQuery("topic_more_description", "*"+ search_str+ "*"))
+										.should(QueryBuilders.wildcardQuery("file_title", "*"+ search_str+ "*")))
+								.setSize(1000)					//return 1000 documents in the results
+								.execute().actionGet();
+					}
 					
-					out.println("<br/>");
+					SearchHit[] hits = response.getHits().getHits(); //getting the results in an array
 					
-					int count1=1;
-					for(String file_name_string : file_name_array)
+					for (int i = 0; i <hits.length; i++) //for each search result
 					{
-						out.println("<a class='download-file'  title='Download this file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+hit.getId()+"&&count1="+count1+"'>"+file_name_string+"      </a>");
-				        count1++;
-				    }
+						SearchHit hit = hits[i];
+						//getting the source, without the meta-data of the document
+						Map<String, Object> result = hit.getSource();
+						//getting the id of the document
+						String id_value=hit.getId().toString();
+						//ajax call: writing to html
+						out.println("<article class='topic'>" +
+								"<header class='clearfix'>" +
+								"<h3 class='post-title gotham-rounded-bold'>" +
+								"<i class='fa fa-book'></i>" +
+								"<a href='open_doc?id_value="+id_value+
+								"' target='_blank'><span id='main-post-tile'>");
+						
+						//for storing values of each field to be displayed
+						Object topic_title = null, more_desc = null, short_desc = null, file_name = null;
+						
+						topic_title=result.get("topic_title");
+						more_desc=result.get("topic_more_description");
+						short_desc=result.get("topic_description");
+						file_name=result.get("file_title");
+						
+						//displaying the required field values
+						out.println(topic_title);	//title display
+						out.println("</span>");
+						
+						if(short_desc.toString().trim().length()>1)		//if the short_description field is not blank
+						{
+							out.println("(<span class='less-description gotham-rounded-light'>");
+							out.println(short_desc);		//short description display
+							out.println("");
+							out.println("</span>)");
+						}
+						
+						out.println("</a></h3>");
+						out.println("</header>");
+						out.println("<p class='more-description gotham-rounded-light'>");
+						
+						//cutting down the more description
+						String short_more_dec=loadSubstringFromDesc(more_desc.toString(),search_str);
+						
+						out.println(short_more_dec);		//long description display, in parts
+						out.println("</p>");
+					
+						//displaying all the attached files.
+						if(file_name!=null && file_name.toString().trim().length()>2)
+						{
+							String[] file_name_array=((String) file_name).split(";");
+							
+							out.println("<br/>");
+							
+							int count1=1;
+							//display each attached file
+							for(String file_name_string : file_name_array)
+							{
+								out.println("<a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+id_value+"&&count1="+count1+"&&operation=download'>"+file_name_string+"      </a>");
+								count1++;
+							}
+						}
+						
+						out.println("</article>");
+					}
+					client.close();	//closing the ES client
 				}
-				
-				out.println("</article>");
+				out.close();	//closing the print writer stream to html
 			}
-			if(out!=null)out.close();
-			if(client!=null)client.close();
 		} //end of searching a document
 		
 		//if task=add
 		else if(taskTitle.equals("add"))
 		{
 			int reply = 44;
-			final Client client = getClient();
 			
 			//getting the values from the form
 			String title = req.getParameter("title");
 			String short_desc = req.getParameter("short_desc");
 			String long_desc = req.getParameter("long_desc");
-			System.out.println(long_desc);
 			String file_name = req.getParameter("file_name");
 			String file_contents = req.getParameter("attach_file");
 			
 			//for last_update_time
 			String dt=new Date().toString();
 			
-			//searching if document already exists by the same title
-			SearchResponse response = client.prepareSearch(INDEX_NAME)
-			        .setTypes(DOC_TYPE)
-			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-			        .setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))                 // Query
-			        .execute()
-			        .actionGet();
+			try(Client client = getClient())	//getting the ES connection
+			{
+				//searching if document already exists by the same title
+				SearchResponse response = client.prepareSearch(INDEX_NAME)
+						.setTypes(DOC_TYPE)
+						.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+						.setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))
+						.execute().actionGet();
 		    
-			SearchHit[] searchresponse=response.getHits().hits();
-		    
-			try //if document already exists, do not insert
-		    {
-		    	searchresponse[0].getId().toString(); //even if 1 document is present
-			    reply = 66; // 66 for already available
+				SearchHit[] searchresponse=response.getHits().hits();
+				
+				try //if document already exists, do not insert
+				{
+					searchresponse[0].getId().toString(); //even if 1 document is present
+					reply = 66; // 66 for already available
+				}
+				catch(ArrayIndexOutOfBoundsException ae) //if not even 1 document is present, then insert
+				{
+					//insertion query
+					client.prepareIndex().setIndex(INDEX_NAME).setType(DOC_TYPE)
+						.setSource("topic_title",title, "topic_description",short_desc, 
+								"topic_more_description", long_desc,"file_title",file_name,
+								"file_content",file_contents, "lastUpdatedBy", uid, 
+								"lastUpdatedTime", dt)
+						.execute().actionGet();
+				}
+				finally //sending the response of successful or unsuccessful insertion
+				{ 
+					client.close();	//closing the ES client
+					String s="home?q="+reply;
+	    			resp.sendRedirect(s);
+				}
 			}
-		    catch(ArrayIndexOutOfBoundsException ae) //if not even 1 document is present, then insert
-		    {
-		    	//insertion query
-		    	client.prepareIndex().setIndex(INDEX_NAME).setType(DOC_TYPE)
-		    			.setSource("topic_title",title, "topic_description",short_desc, 
-		    				"topic_more_description", long_desc,"file_title",file_name,
-		    				"file_content",file_contents, "lastUpdatedBy", uid, 
-		    				"lastUpdatedTime", dt)
-		    			.execute().actionGet();
-		    }
-		    finally //sending the response of successful or unsuccessful insertion
-		    { 
-		    	if(client!=null)client.close();
-				String s="home?q="+reply;
-				resp.sendRedirect(s);
-		    }
 		} //end of addition of a document
 		
 		
@@ -225,152 +234,197 @@ public class Conn_add_new extends HttpServlet
 			String file_name = req.getParameter("file_name");
 			String file_contents = req.getParameter("attach_file"); 
 			String doc_id_no = req.getParameter("doc_id_no");
+			String file_count_delete = req.getParameter("file_count_delete").trim();
+			
 			//for last_update_time
 			String dt=new Date().toString();
-			//getting the ES client
-			final Client client = getClient();
 			
-			
-			GetResponse response = client.prepareGet(INDEX_NAME, DOC_TYPE, doc_id_no).get();
-			Map<String, Object> result=response.getSource();
-		    
-		    try
-		    {
-			    
-		    	UpdateRequest updateRequest=null;
-			    
-		    	//if any new files are to be attached
-			    if(file_name.length()>2)
-			    {
-			    	//getting the file names of all the associated files
-					String file_name_db=result.get("file_title").toString();
+			try(Client client = getClient())	//getting the ES connection
+			{
+				//getting the document with the ID
+				GetResponse response = client.prepareGet(INDEX_NAME, DOC_TYPE, doc_id_no).get();
+				Map<String, Object> result=response.getSource();
+				
+				try
+				{
+					UpdateRequest updateRequest=null;
 					
-					//getting the file contents of all the associated files
-					String file_contents_db = result.get("file_content").toString();
-					
-					//separating all the file names attached with the document
-	            	String file_name_array[]=file_name.split(";");
-	            	
-	            	//separating all the file contents attached with the document
-	            	String file_contents_array[]=file_contents.split(";");
-	            	
-	            	file_name="";
-					file_contents="";
-					
-					/*
-					 * checking if any files, newly added, are previously attached or not.
-					 * Accordingly, append the file names & contents
-					 */
-					for(int index=0; index < file_name_array.length; index++)
+					//if any new files are to be attached and remove
+					if(file_name.length()>2 || file_count_delete.length()>0)
 					{
-						if(!(file_name_db.toLowerCase().contains(file_name_array[index].toLowerCase())))
+						//getting the file names of all the associated files
+						String file_name_db=result.get("file_title").toString();
+					
+						//getting the file contents of all the associated files
+						String file_contents_db = result.get("file_content").toString();
+						
+						//for deleting the attached file
+						if(file_count_delete.length()>0)
 						{
-							file_name=file_name+file_name_array[index]+";";
-							file_contents=file_contents+file_contents_array[index]+";";
+							//splitting the counter of to be removed file
+							String file_count_array[]=file_count_delete.split(";");
+							
+			            	String file_name_d_array[]=((String) file_name_db).split(";");
+			            	
+			            	//separating all the file contents attached with the document
+			            	String file_contents_d_array[]=((String) file_contents_db).split(";");
+							
+							/*
+							 * checking if any files, newly added, are previously attached or not.
+							 * Accordingly, append the file names & contents
+							 */
+							for(int index=0; index < file_name_d_array.length; index++)
+							{
+								int flag=0;
+								for(int i=0; i < file_count_array.length; i++)
+									if(index==(Integer.parseInt(file_count_array[i])-1))
+									{
+										flag=1;
+										break;
+									}
+								if(flag==0){
+									file_name=file_name+file_name_d_array[index]+";";
+									file_contents=file_contents+file_contents_d_array[index]+";";
+								}
+							}
+							file_name_db = file_name;
+							file_contents_db = file_contents;
 						}
-					}
-					//update query
-					updateRequest = new UpdateRequest(INDEX_NAME, DOC_TYPE, doc_id_no).doc(jsonBuilder()
+						//for adding the file
+						else if(file_name.length()>2 )
+						{
+							//separating all the file names attached with the document
+							String file_name_array[]=file_name.split(";");
+							
+							//separating all the file contents attached with the document
+							String file_contents_array[]=file_contents.split(";");
+						file_name="";
+						file_contents="";
+						/*
+						 * checking if any files, newly added, are previously attached or not.
+						 * Accordingly, append the file names & contents
+						 */
+						for(int index=0; index < file_name_array.length; index++)
+						{
+							if(!(file_name_db.toLowerCase().contains(file_name_array[index].toLowerCase())))
+							{
+								file_name=file_name+file_name_array[index]+";";
+								file_contents=file_contents+file_contents_array[index]+";";
+							}
+						}
+						
+						file_name_db = file_name+file_name_db;
+						file_contents_db = file_contents;
+						}
+						//update query
+						updateRequest = new UpdateRequest(INDEX_NAME, DOC_TYPE, doc_id_no).doc(jsonBuilder()
 						        .startObject()
 						        .field("topic_title", title)
 						        .field("topic_description", short_desc)
 						        .field("topic_more_description", long_desc)
-						        .field("file_title", file_name+file_name_db)
-						        .field("file_content", file_contents+file_contents_db)
+						        .field("file_title", file_name_db)
+						        .field("file_content", file_contents_db)
 						        .field("lastUpdatedBy", uid)
-						        .field("lastUpdatedTime", dt)
-						        .endObject());
+						        .field("lastUpdatedTime", dt).endObject());
+					}
+					else
+					{
+						//update query, without changes to the attached files.
+						updateRequest = new UpdateRequest(INDEX_NAME, DOC_TYPE, doc_id_no).doc(jsonBuilder()
+								.startObject()
+								.field("topic_title", title)
+								.field("topic_description", short_desc)
+								.field("topic_more_description", long_desc)
+								.field("lastUpdatedBy", uid).field("lastUpdatedTime", dt).endObject());
+					}
+					try
+					{
+						client.update(updateRequest).get(); //executing the update query
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					}
 				}
-			    else
-			    {
-			    	//update query, without changes to the attached files.
-			    	updateRequest = new UpdateRequest(INDEX_NAME, DOC_TYPE, doc_id_no).doc(jsonBuilder()
-					        .startObject()
-					        .field("topic_title", title)
-					        .field("topic_description", short_desc)
-					        .field("topic_more_description", long_desc)
-					        .field("lastUpdatedBy", uid).field("lastUpdatedTime", dt).endObject());
-			    }
-				try
+				catch(ArrayIndexOutOfBoundsException ae)
 				{
-					client.update(updateRequest).get(); //executing the update query
-				} 
-				catch (Exception e) 
+					reply = 55; // 55 for doc is not available
+				}
+				finally //sending the response of successful or unsuccessful updation
 				{
-					e.printStackTrace();
+					client.close();	//closing the ES client
+					String s="home?q="+reply;
+					resp.sendRedirect(s);
 				}
 			}
-		    catch(ArrayIndexOutOfBoundsException ae)
-		    {
-		    	reply = 55; // 55 for doc is not available
-		    }
-		    finally //sending the response of successful or unsuccessful updation
-		    {
-		    	if(client!=null)client.close();
-				String s="home?q="+reply;
-				resp.sendRedirect(s);
-		    }
-
 		} //end of updating a document
 		
 		//if task=delete
 	    else if (taskTitle.equals("delete"))
 	    {
 	    	int reply = 44;
-	    	
-	    	//getting the ES client
-	    	final Client client = getClient();
-	    	
+	    		    	
 	    	String title = req.getParameter("title"); //getting the title of the document to delete
 	    	
-	    	//getting the particular document
-	    	SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
-	    			.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-	    			.setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))
-	    			.execute().actionGet();
-	    	SearchHit[] searchresponse = response.getHits().hits();
-	    	try
+	    	try(Client client = getClient())	//getting the ES connection
 	    	{
-	    		String id_value = searchresponse[0].getId().toString(); //getting the ID of the document
-	    		client.prepareDelete(INDEX_NAME, DOC_TYPE, id_value).get(); //delete query
+	    		//getting the particular document
+	    		SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
+	    				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+	    				.setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))
+	    				.execute().actionGet();
+	    		
+	    		SearchHit[] searchresponse = response.getHits().hits();
+	    		
+	    		try
+	    		{
+	    			String id_value = searchresponse[0].getId().toString(); //getting the ID of the document
+	    			client.prepareDelete(INDEX_NAME, DOC_TYPE, id_value).get(); //delete query
+	    		}
+	    		catch (ArrayIndexOutOfBoundsException ae)
+	    		{
+	    			reply = 55;
+	    		}
+	    		finally  //sending the response of successful or unsuccessful deletion
+	    		{
+	    			client.close();	//closing the ES client
+	    			String s="home?q="+reply;
+	    			resp.sendRedirect(s);
+	    		}
 	    	}
-	    	catch (ArrayIndexOutOfBoundsException ae)
-	    	{
-	    		reply = 55;
-	    	}
-	    	finally  //sending the response of successful or unsuccessful deletion
-	    	{
-	    		if(client!=null)client.close();
-				String s="home?q="+reply;
-				resp.sendRedirect(s);
-		    }
 	    } //end of deleting the document
 		
 		//providing a list of possible titles according to the text in the box
 		else if(taskTitle.equals("gettingTheTitleAutocomplete"))
 		{
 			resp.setContentType("text/html");
-			PrintWriter out = resp.getWriter();
 			
-			//getting the ES client
-			final Client client = getClient();
-			
-			//getting all the documents
-			SearchResponse response = client.prepareSearch(INDEX_NAME)
-			        .setTypes(DOC_TYPE)
-			        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-			        .setQuery(QueryBuilders.wildcardQuery("topic_description", "*"))
-			        .setSize(4000).execute().actionGet();
-		    SearchHit[] hits = response.getHits().getHits();
-		    
-		    //displaying the title of all the documents
-		    for (int i = 0; i <hits.length; i++)
-		    {
-		    	Object topic_title = hits[i].getSource().get("topic_title");
-			    out.println("<span class='doc-title-value'>"+topic_title+"</span>");
-		    }
-		    if(client!=null)client.close();
-		    if(out!=null)out.close();
+			try(PrintWriter out = resp.getWriter())
+			{
+				
+				try(Client client = getClient())	//getting ES connection
+				{
+					//getting all the documents
+					SearchResponse response = client.prepareSearch(INDEX_NAME)
+							.setTypes(DOC_TYPE)
+							.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+							.setQuery(QueryBuilders.wildcardQuery("topic_description", "*"))
+							.setSize(4000).execute().actionGet();
+					
+					SearchHit[] hits = response.getHits().getHits();
+					
+					//displaying the title of all the documents
+					for (int i = 0; i <hits.length; i++)
+					{
+						Object topic_title = hits[i].getSource().get("topic_title");
+						out.println("<span class='doc-title-value'>"+topic_title+"</span>");
+					}
+					
+					client.close();
+				}
+				
+				out.close();
+			}
 		} //end of the Auto-Complete
 	}//End of doPost
     
@@ -385,15 +439,17 @@ public class Conn_add_new extends HttpServlet
         reader.close();
         return bytes;
     }
-	public static String loadSubstringFromDesc(String originText,String search_string)
+	
+	public static String loadSubstringFromDesc(String originText, String search_string)
 	{
 		String finalString="";
 		String str1[]=originText.split("\\.");
 		int j=0,flag=0,flag2=0;
-		try {
+		try 
+		{
 		for(int i=0;i<str1.length;i++){
 			if(j<4){
-				if((str1[i].toLowerCase()).contains(search_string.toLowerCase()))
+				if(str1[i].toLowerCase().contains(search_string.toLowerCase()))
 				{
 					flag=1;
 					flag2=0;
