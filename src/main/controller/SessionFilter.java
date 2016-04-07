@@ -25,7 +25,7 @@ public void doFilter(ServletRequest req, ServletResponse resp,
 		//Generate Login Page with Error Info
 		else if(!url.endsWith("/Login.html") && !url.endsWith("/login") && !url.endsWith("/loginErr")){
 		req.setAttribute("errMsg", "In-Valid Session !!! Please Login ...");
-		RequestDispatcher dispatcher = req.getRequestDispatcher("loginErr");		
+		RequestDispatcher dispatcher = req.getRequestDispatcher("/loginErr");		
 		dispatcher.forward(req, resp);
 		}
 		else

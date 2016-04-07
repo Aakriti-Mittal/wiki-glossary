@@ -113,6 +113,56 @@ li#dw-user-name {
 
 
 /* end for header*/
+/*for sliding effect div*/
+.recentFiles {
+    border: 1px solid red;
+    width: 450px;
+    height: 330px !important;
+    overflow: hidden;
+    position: absolute;
+    left: 26%;
+    margin-left: 500px;
+}
+.recentEvents{
+    border: 1px solid red;
+    width: 450px;
+    height: 330px;
+    overflow: hidden;
+    position: absolute;
+    left: 26%;
+	}
+.recentEvents ul,.recentFiles ul{
+  list-style:none;
+  margin:0;
+  padding:0;
+  position: relative;
+}
+.recentEvents .mask,.recentFiles .mask {
+  position: relative;
+  left: 0px;
+  top: 10px;
+  width: 450px;
+  height: 330px;
+  overflow: hidden;
+}
+.recentEvents li,.recentFiles li{
+    list-style: none;
+    border-bottom: 1px solid green;
+    padding: 10px;
+    height: 58px;
+    overflow: hidden;
+    color: slateblue;    
+}
+.recentEvents h4,.recentFiles h4 {
+	padding-left: 12px;
+    font-size: 18px;
+    color: darkblue;
+    text-decoration: underline;
+    background-color: blanchedalmond;
+    height: 30px;
+    margin-top: 1px;
+}
+/*end for sliding effect div*/
 /*for login form*/
 #dw-login-form{
     position: fixed;
@@ -439,7 +489,7 @@ a.download-file {
 .pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
     z-index: 1;
 }
-ul#pagination-demo {
+ul.pagination-demo {
     display: table;
     margin: 28px auto;
 }

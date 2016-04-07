@@ -36,7 +36,25 @@ $.ajax({
     	$('.doc-title-value').each( function(){
     		availableTags.push($(this).text());
     	});
-    	$('.doc-title-value').remove();
+    	if(window.location.toString().indexOf("home")>-1)
+    	{
+    		$("#contents-for-autocomplete").show();
+	    	var countLi=0;
+	    	$(".recentEvents ul>li").each(function(){
+	    		countLi++;
+	    	});
+	    	if(countLi>5){
+	    		$(".recentEvents ul").liScroll();
+	    	}
+	    	countLi=0;
+	    	$(".recentFiles ul>li").each(function(){
+	    		countLi++;
+	    	});
+	    	if(countLi>5){
+	    		$(".recentFiles ul").liScroll();
+	    	}
+	    	$('.doc-title-value').remove();
+    	}
     },
     type: 'POST'
 });
@@ -49,7 +67,8 @@ $(function() {
 
 /* main search function*/
 function postSearchFunction(){
-	$('#pagination-demo').remove();
+	$('.pagination-demo').remove();
+	$('#contents-for-autocomplete').remove();
 	setTimeout(function () { $("ul#ui-id-1, ul#ui-id-2, ul#ui-id-3").hide(); }, 500);
 	$("#no-result-found").hide();
 	var search_text = $("#search-text-box").val();
@@ -71,11 +90,15 @@ else
 	        search_text: search_text
 	    },
 	    success:function(data){
+	    	if(data.indexOf("dw-login-form")>-1)
+	    		{
+	    		window.location.replace("home");
+	    		}
 	    	$("#topic-list").html(data);
 	    	if($(".topic").length==0)
 	    	{
 	    		$("#no-result-found").show();
-		    	$('#pagination-demo').remove();
+		    	$('.pagination-demo').remove();
 	    	}
 	    	else{
 	    		executePagination();
@@ -301,7 +324,8 @@ $('.input_file-upload').on('change',function(){
 
 /*for the pagination*/
 function executePagination(){	
-		$("#topic-list").after("<ul id='pagination-demo' class='pagination-sm'></ul>");
+		$('.pagination-demo').remove();
+		$("#topic-list").after("<ul class='pagination-demo pagination-sm'></ul>");
 		var k=1;
 		$(".topic").each(function() {
 			$(this).hide();
@@ -309,7 +333,7 @@ function executePagination(){
 		   	else $(this).hide();
 		  	k++;
 		});
-		$('#pagination-demo').show();
+		$('.pagination-demo').show();
 		
 		var p_ttlPages;
 		if($(".topic").length % 10 == 0){
@@ -321,7 +345,7 @@ function executePagination(){
 		var p_vpages=1;
 		if(p_ttlPages>10) p_vpages=10;
 		else if(p_ttlPages>1 && p_ttlPages<10) p_vpages=p_ttlPages;
-		$('#pagination-demo').twbsPagination({
+		$('.pagination-demo').twbsPagination({
 		        totalPages: p_ttlPages,
 		        visiblePages: p_vpages,
 		        onPageClick: function (event, page) {
@@ -335,8 +359,46 @@ function executePagination(){
 		   }
 		});
 		if(p_vpages==1){
-		   	$('#pagination-demo').hide();
+		   	$('.pagination-demo').hide();
 		   }
 }
 /*end for pagination*/
 $("#dw-user-name").text($("#dw-user-id").text());
+/*for sliding effect div*/
+
+jQuery.fn.liScroll = function(settings) {
+	settings = jQuery.extend({
+		travelocity: 0.03
+		}, settings);		
+		return this.each(function(){
+				var $strip = jQuery(this);
+				$strip.addClass("newsticker")
+				var stripHeight = 1;
+				$strip.find("li").each(function(i){
+					stripHeight += jQuery(this, i).outerHeight(true); // thanks to Michael Haszprunar and Fabien Volpi
+				});
+				var $mask = $strip.wrap("<div class='mask'></div>");
+				var $tickercontainer = $strip.parent().wrap("<div class='tickercontainer'></div>");								
+				var containerHeight = $strip.parent().parent().height();	//a.k.a. 'mask' width 	
+				$strip.height(stripHeight);			
+				var totalTravel = stripHeight;
+				var defTiming = totalTravel/settings.travelocity;	// thanks to Scott Waye		
+				function scrollnews(spazio, tempo){
+				$strip.animate({top: '-='+ spazio}, tempo, "linear", function(){$strip.css("top", containerHeight); scrollnews(totalTravel, defTiming);});
+				}
+				scrollnews(totalTravel, defTiming);				
+				$strip.hover(function(){
+				jQuery(this).stop();
+				},
+				function(){
+				var offset = jQuery(this).offset();
+				var residualSpace = offset.top + stripHeight;
+				var residualTime = residualSpace/settings.travelocity;
+				scrollnews(residualSpace, residualTime);
+				});			
+		});	
+};
+
+
+
+/*end for sliding effect div*/

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,6 +31,9 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 
 
 public class Conn_add_new extends HttpServlet 
@@ -73,6 +78,7 @@ public class Conn_add_new extends HttpServlet
 			
 			try(PrintWriter out = resp.getWriter())
 			{
+	
 				//search query
 				try(Client client = getClient()) //getting the ES connection
 				{
@@ -81,8 +87,8 @@ public class Conn_add_new extends HttpServlet
 						response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
 								//search for the text in these fields only
 								.setQuery(QueryBuilders.boolQuery()
-										.should(QueryBuilders.matchPhrasePrefixQuery("topic_title", search_str))
-										.should(QueryBuilders.matchPhrasePrefixQuery("topic_description", search_str))
+										.should(QueryBuilders.matchPhrasePrefixQuery("topic_title", search_str).boost(2))
+										.should(QueryBuilders.matchPhrasePrefixQuery("topic_description", search_str).boost((float) 1.5))
 										.should(QueryBuilders.matchPhrasePrefixQuery("topic_more_description", search_str))
 										.should(QueryBuilders.matchPhrasePrefixQuery("file_title", search_str)))
 								.setSize(1000)					//return 1000 documents in the results
@@ -92,8 +98,8 @@ public class Conn_add_new extends HttpServlet
 						response = client.prepareSearch(INDEX_NAME).setTypes(DOC_TYPE)
 								//search for the text in these fields only
 								.setQuery(QueryBuilders.boolQuery()
-										.should(QueryBuilders.wildcardQuery("topic_title","*"+ search_str+ "*"))
-										.should(QueryBuilders.wildcardQuery("topic_description", "*"+ search_str+ "*"))
+										.should(QueryBuilders.wildcardQuery("topic_title","*"+ search_str+ "*").boost(2))
+										.should(QueryBuilders.wildcardQuery("topic_description", "*"+ search_str+ "*").boost((float) 1.5))
 										.should(QueryBuilders.wildcardQuery("topic_more_description", "*"+ search_str+ "*"))
 										.should(QueryBuilders.wildcardQuery("file_title", "*"+ search_str+ "*")))
 								.setSize(1000)					//return 1000 documents in the results
@@ -158,7 +164,7 @@ public class Conn_add_new extends HttpServlet
 							//display each attached file
 							for(String file_name_string : file_name_array)
 							{
-								out.println("<a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+id_value+"&&count1="+count1+"&&operation=download'>"+file_name_string+"      </a>");
+								out.println("<a class='download-file' href='FileOperationServlet?file="+file_name_string+"&&id_no="+id_value+"&&count1="+count1+"&&operation=download'>"+file_name_string+"</a>");
 								count1++;
 							}
 						}
@@ -192,7 +198,7 @@ public class Conn_add_new extends HttpServlet
 				SearchResponse response = client.prepareSearch(INDEX_NAME)
 						.setTypes(DOC_TYPE)
 						.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-						.setQuery(QueryBuilders.matchQuery("topic_title", title.trim().toLowerCase()))
+						.setQuery(QueryBuilders.matchPhrasePrefixQuery("topic_title", title.trim().toLowerCase()))
 						.execute().actionGet();
 		    
 				SearchHit[] searchresponse=response.getHits().hits();
@@ -408,7 +414,7 @@ public class Conn_add_new extends HttpServlet
 					SearchResponse response = client.prepareSearch(INDEX_NAME)
 							.setTypes(DOC_TYPE)
 							.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-							.setQuery(QueryBuilders.wildcardQuery("topic_description", "*"))
+							.setQuery(QueryBuilders.wildcardQuery("topic_title", "*"))
 							.setSize(4000).execute().actionGet();
 					
 					SearchHit[] hits = response.getHits().getHits();
@@ -417,9 +423,74 @@ public class Conn_add_new extends HttpServlet
 					for (int i = 0; i <hits.length; i++)
 					{
 						Object topic_title = hits[i].getSource().get("topic_title");
-						out.println("<span class='doc-title-value'>"+topic_title+"</span>");
+						out.println("<span style='display:none' class='doc-title-value'>"+topic_title+"</span>");
 					}
 					
+					SearchHit tmp;
+			        SimpleDateFormat f = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy");
+			        try{
+			        for (int i = 0; i < hits.length-1; i++) {
+			        	for (int j = i+1; j < hits.length; j++) {
+			            if (f.parse(((String) hits[i].getSource().get("lastUpdatedTime"))).getTime() < 
+			            		f.parse(((String) hits[j].getSource().get("lastUpdatedTime"))).getTime()) {
+			                tmp = hits[i];
+			                hits[i] = hits[j];
+			                hits[j] = tmp;
+			            }
+			        	}
+			        }
+			        }
+			        catch(Exception e){
+			        	e.printStackTrace();
+			        }
+			        out.println("<div class='recentEvents'>");
+			        out.println("<h4>Recent Event</h4>");
+			        out.println("<ul>");
+			        for(int i = 0; i < 10; i++)
+			        {
+			        	try {
+							out.println("<li>"+(i+1)+". "+"<a href='open_doc?id_value="+hits[i].getId()+"' target='_blank'>"+"<strong>"+
+									hits[i].getSource().get("topic_title")+"</strong> </a>modified by "+
+									hits[i].getSource().get("lastUpdatedBy")+" on "+
+											new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy").parse(hits[i].getSource().get("lastUpdatedTime").toString()))+"</li>");
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			        }
+			        out.println("</ul>");
+			        out.println("</div>");
+
+			        
+			        out.println("<div class='recentFiles'>");
+			        out.println("<h4>Recent Files</h4>");
+			        out.println("<ul>");
+			        int count_file=1;
+			        for(int i = 0; i <  hits.length-1; i++)
+			        {
+			        	String file_title=hits[i].getSource().get("file_title").toString();
+			        	if(file_title.length()>2)
+			        		if(count_file<10)
+			        		{
+			        			String file_title_array[]=file_title.split(";");
+			        			for(int j=0;j<file_title_array.length;j++)
+			        			{
+				        			try {
+										out.println("<li>"+(count_file)+". "+"<a href='FileOperationServlet?file="+file_title_array[j]+
+												"&&id_no="+hits[i].getId()+"&&count1="+(j+1)+"&&operation=download'>"+"<strong>"+file_title_array[j]+
+												"</strong></a> Added by "+hits[i].getSource().get("lastUpdatedBy")+" on "+
+												new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy").parse(hits[i].getSource().get("lastUpdatedTime").toString()))+"</li>");
+									} catch (ParseException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+				        			count_file++;
+			        			}
+			        		}
+			        }
+			        out.println("</ul>");
+			        out.println("</div>");
+
 					client.close();
 				}
 				
